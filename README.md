@@ -1,5 +1,4 @@
-
---- a/document.html+++ b/document.html@@ -1,11 +1,12 @@ <!DOCTYPE html>
+<!DOCTYPE html>
 -<html lang="ar" dir="rtl" data-theme="light" style=""><head>
 +<html lang="ar" dir="rtl">
 +<head>
