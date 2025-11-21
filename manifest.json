@@ -1,22 +1,11 @@
-Basic Information:
-
-App Name: Pro Coach - إدارة فرق كرة القدم
-Short Name: Pro Coach
-Description: تطبيق احترافي لإدارة فرق كرة القدم مع ميزات شاملة للمدربين واللاعبين
-URLs:
-
-Start URL: /procoach-app/
-Scope: /procoach-app/
-Display:
-
-Display Mode: standalone
-Orientation: portrait
-Colors:
-
-Theme Color: #059669
-Background Color: #ffffff
-Advanced:
-
-Language: ar
-Direction: rtl
-Categories: sports, productivity
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "19ameer91.github",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "19ameer91.github",
+  "start_url": "/",
+  "theme_color": "#ffffff"
+}
