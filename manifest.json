@@ -1,28 +1,24 @@
 {
-  "name": "Pro Coach",
-  "short_name": "Pro Coach",
-  "description": "تطبيق احترافي لإدارة فرق كرة القدم",
-  "start_url": "/procoach-app/",
-  "scope": "/procoach-app/",
+  "background_color": "#059669",
+  "dir": "ltr",
   "display": "standalone",
-  "orientation": "portrait",
-  "theme_color": "#059669",
-  "background_color": "#ffffff",
-  "dir": "rtl",
-  "lang": "ar",
-  "categories": ["sports", "productivity"],
-  "icons": [
-    {
-      "src": "https://via.placeholder.com/192x192.png?text=PC",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://via.placeholder.com/512x512.png?text=PC",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+  "name": "Pro Coach",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Pro Coach",
+  "start_url": "/procoach-app/",
+  "theme_color": "rgb(190, 87, 87)",
+  "description": "A professional application for managing football teams",
+  "id": "Pro",
+  "categories": [
+    "business",
+    "education",
+    "fitness",
+    "health",
+    "lifestyle",
+    "personalization",
+    "productivity",
+    "social",
+    "sports"
   ]
 }
