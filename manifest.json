@@ -1,24 +1,13 @@
 {
-  "background_color": "#059669",
+  "background_color": "#ffffff",
   "dir": "ltr",
   "display": "standalone",
   "name": "Pro Coach",
   "orientation": "any",
   "scope": "/",
-  "short_name": "Pro Coach",
-  "start_url": "/procoach-app/",
-  "theme_color": "rgb(190, 87, 87)",
-  "description": "A professional application for managing football teams",
-  "id": "Pro",
-  "categories": [
-    "business",
-    "education",
-    "fitness",
-    "health",
-    "lifestyle",
-    "personalization",
-    "productivity",
-    "social",
-    "sports"
-  ]
+  "short_name": "trainer",
+  "start_url": "//procoach-app/",
+  "theme_color": "#059669",
+  "id": "trainer",
+  "description": "A professional application for managing football teams"
 }
