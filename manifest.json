@@ -1,5 +1,5 @@
 {
-  "background_color": "#ffffff",
+  "background_color": "#059669",
   "dir": "ltr",
   "display": "standalone",
   "name": "Pro Coach",
@@ -7,7 +7,6 @@
   "scope": "/",
   "short_name": "Pro Coach",
   "start_url": "/procoach-app/",
-  "theme_color": "#059669",
-  "id": "Id",
+  "theme_color": "#ffffff",
   "description": "تطبيق احترافي لإدارة فرق كرة القدم"
 }
