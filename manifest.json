@@ -1,13 +1,13 @@
 {
-  "لون الخلفية": "#ffffff",
+  "background_color": "#ffffff",
   "dir": "ltr",
-  "العرض": "مستقل"،
-  "الاسم": "مدرب محترف"،
-  "الاتجاه": "صورة شخصية"،
-  "نِطَاق": "/"،
-  "short_name": "مدرب محترف"،
-  "start_url": "/procoach-app/"،
-  "لون السمة": "#059669"،
-  "فعلتُ"،
-  "description": "تطبيق عميد ابتكار فرق كرة القدم"
+  "display": "standalone",
+  "name": "Pro Coach",
+  "orientation": "portrait",
+  "scope": "/",
+  "short_name": "Pro Coach",
+  "start_url": "/procoach-app/",
+  "theme_color": "#059669",
+  "id": "Id",
+  "description": "تطبيق احترافي لإدارة فرق كرة القدم"
 }
