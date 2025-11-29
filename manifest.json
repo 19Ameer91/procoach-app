@@ -1,25 +1,12 @@
 {
-  "name": "Pro Coach - إدارة فرق كرة القدم",
-  "short_name": "Pro Coach",
-  "description": "تطبيق احترافي لإدارة فرق كرة القدم مع نظام دوريات وسوق إعارات وملعب تكتيكي",
-  "start_url": "/procoach-app/",
-  "scope": "/procoach-app/",
-  "display": "standalone",
-  "orientation": "portrait",
-  "theme_color": "#059669",
   "background_color": "#ffffff",
-  "icons": [
-    {
-      "src": "/procoach-app/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/procoach-app/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Pro Coach",
+  "orientation": "portrait",
+  "scope": "/\"start_url\": \"/procoach-app/\"",
+  "short_name": "Pro Coach",
+  "start_url": "/procoach-app/\"",
+  "theme_color": "#059669",
+  "description": "طبيق احترافي لإدارة فرق كرة القدم"
 }
