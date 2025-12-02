@@ -4,9 +4,9 @@
   "display": "standalone",
   "name": "Pro Coach",
   "orientation": "portrait",
-  "scope": "/\"start_url\": \"/procoach-app/\"",
+  "scope": "/procoach-app/\"
   "short_name": "Pro Coach",
-  "start_url": "/procoach-app/\"",
+  "start_url": "/procoach-app/"
   "theme_color": "#059669",
   "description": "طبيق احترافي لإدارة فرق كرة القدم"
 }
