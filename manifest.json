@@ -3,8 +3,8 @@
   "dir": "ltr",
   "display": "standalone",
   "name": "Pro Coach",
-  "orientation": "portrait",
-  "scope": "/procoach-app/\"
+  "orientation": "portrait"
+  "scope": "/procoach-app/"
   "short_name": "Pro Coach",
   "start_url": "/procoach-app/"
   "theme_color": "#059669",
