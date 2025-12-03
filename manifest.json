@@ -1,7 +1,7 @@
 {
   "name": "Pro Coach - إدارة فرق كرة القدم",
   "short_name": "Pro Coach",
-  "description": "تطبيق احترافي لإدارة فرق كرة القدم مع نظام دوريات وسوق إعارات وملعب تكتيكي",
+  "description": "تطبيق احترافي لإدارة فرق كرة القدم مع نظام دوريات وسوق إعارات وملعب تكتيكي ونظام القرعة المتقدم",
   "start_url": "/procoach-app/",
   "scope": "/procoach-app/",
   "display": "standalone",
