@@ -15,7 +15,7 @@
       "src": "/procoach-app/icon-192.png",
       "sizes": "192x192",
       "type": "image/jpeg",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/procoach-app/icon-512.png",
