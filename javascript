@@ -1,31 +1,42 @@
-async function startApp() {
-    const league = document.getElementById('leagueCode').value.toUpperCase();
-    const role = document.getElementById('role').value;
-    const name = document.getElementById('userName').value;
+// دالة إنشاء الدوري بـ "الكلمة الحاسمة" للمشرف
+async function createLeagueContract() {
+    const leagueID = document.getElementById('leagueCode').value.toUpperCase();
+    const targetTeams = document.getElementById('targetTeams').value; // الرقم الحاسم
+    const isAdminPaid = false; // افتراضياً باقة عادية
 
-    if (!league || !name) return alert("يا قائد، أدخل الكود واسمك!");
-
-    // 🕵️ التحقق من وجود "مشرف" لهذه الغرفة في Firebase
-    const checkURL = `https://procoach-40d9f-default-rtdb.firebaseio.com/leagues/${league}/admin.json`;
-    const response = await fetch(checkURL);
-    const adminData = await response.json();
-
-    if (role === "ADMIN") {
-        if (!adminData) {
-            // 🆕 إذا لم يكن هناك مشرف، أنت تصبح المشرف الأول!
-            const password = prompt("هذا الدوري جديد، ضع كلمة سر لإدارته:");
-            await fetch(checkURL, { method: 'PUT', body: JSON.stringify({ name: name, pass: password }) });
-            alert("تم تنصيبك مشرفاً عاماً لهذا الدوري 🛡️");
-        } else {
-            // 🔐 إذا كان هناك مشرف، يجب إدخال كلمة السر الصحيحة
-            const password = prompt("أدخل كلمة سر المشرف للوصول للوحة التحكم:");
-            if (password !== adminData.pass) {
-                alert("❌ كلمة السر خطأ! سيتم دخولك كلاعب فقط.");
-                return; // منع الدخول كمشرف
-            }
-        }
+    if (!targetTeams || targetTeams < 2) {
+        alert("يا قائد، يجب تحديد عدد فرق منطقي (2 فأكثر)!");
+        return;
     }
 
+    const leagueContract = {
+        config: {
+            totalTeams: targetTeams, // الكلمة الحاسمة للمشرف
+            status: "PRE-START", // حالة ما قبل البداية (تسمح بالترقية)
+            isElite: isAdminPaid,
+            createdAt: new Date().toLocaleString(),
+            lockCount: true // قفل العدد الكلي
+        }
+    };
+
+    // حفظ العقد في Firebase
+    await fetch(`${baseURL}${leagueID}/contract.json`, { method: 'PUT', body: JSON.stringify(leagueContract) });
+    
+    alert(`🛡️ تم اعتماد الميدان! الكلمة الحاسمة هي ${targetTeams} فرق. بياناتك في أمان ولن تُحذف أبداً.`);
+}
+
+// دالة ترقية الباقة (تتم فقط قبل البداية)
+async function upgradePackage(leagueID) {
+    const response = await fetch(`${baseURL}${leagueID}/contract/status.json`);
+    const status = await response.json();
+
+    if (status === "PRE-START") {
+        // تنفيذ عملية الترقية لخدمات النخبة
+        alert("🚀 جاري فتح 'جسور النخبة' لك.. يمكنك الآن الاستمتاع بالخدمات المدفوعة.");
+    } else {
+        alert("❌ عذراً يا قائد، الدوري بدأ فعلياً! لا يمكن تغيير الباقة بعد صافرة الانطلاق.");
+    }
+}
     // 🏟️ الدخول للميدان بعد التحقق
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('tactics-screen').classList.remove('hidden');
