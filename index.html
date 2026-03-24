@@ -117,7 +117,47 @@
             
             setupPlayers();
         }
+<div id="league-setup" class="glass-card">
+    <h3 style="color: var(--gold);">إعدادات الميدان الجديد 🛡️</h3>
+    
+    <label>حدد عدد الفرق المستهدفة:</label>
+    <input type="number" id="targetTeams" value="12" min="4" max="32" oninput="updateDeadlineText()">
+    
+    <div id="deadline-info" style="font-size: 13px; color: #ccc; margin: 10px 0;">
+        المهلة الزمنية الممنوحة: <span id="daysCount" style="color: var(--gold); font-weight: bold;">5</span> أيام
+    </div>
 
+    <p style="font-size: 11px; color: #ff4444;">⚠️ تنبيه: إذا لم يكتمل العدد المطلوب خلال المهلة، سيتم حذف البيانات تلقائياً (إلا لحاملي VIP).</p>
+    
+    <button onclick="createOfficialLeague()">تنشيط كود الدوري ⚡</button>
+</div>
+
+<script>
+    function updateDeadlineText() {
+        const teams = document.getElementById('targetTeams').value;
+        // معادلة ديناميكية: يوم واحد لكل 3 فرق + يومين إضافيين للتحضير
+        const days = Math.ceil(teams / 3) + 2;
+        document.getElementById('daysCount').innerText = days;
+    }
+
+    async function createOfficialLeague() {
+        const teams = document.getElementById('targetTeams').value;
+        const days = Math.ceil(teams / 3) + 2;
+        const leagueID = document.getElementById('leagueCode').value;
+
+        const leagueConfig = {
+            target: teams,
+            deadlineDays: days,
+            createdAt: new Date().getTime(),
+            status: "PENDING",
+            isVIP: false // افتراضي
+        };
+
+        // حفظ الإعدادات في Firebase تحت كود الدوري
+        await fetch(`${baseURL}${leagueID}/config.json`, { method: 'PUT', body: JSON.stringify(leagueConfig) });
+        alert(`تم فتح الغرفة! أمامك ${days} أيام لجمع ${teams} فريقاً.`);
+    }
+</script>
         // إنشاء لاعبين قابلين للسحب والإفلات
         function setupPlayers() {
             const board = document.getElementById('tactics-board');
