@@ -59,3 +59,40 @@ async function checkLeagueStatus(leagueID) {
         }
     }
 }
+async function upgradeToElite(leagueID) {
+    const url = `https://procoach-40d9f-default-rtdb.firebaseio.com/leagues/${leagueID}/config.json`;
+    
+    const eliteConfig = {
+        status: "ELITE_CHAMPIONS", // الحالة الجديدة 🏆
+        isVIP: true,
+        deadline: "REMOVED", // إزاحة الشروط
+        features: "FULL_ACCESS", // جسور الشروط الجديدة
+        badge: "GOLDEN_SHIELD"
+    };
+
+    await fetch(url, { method: 'PATCH', body: JSON.stringify(eliteConfig) });
+    
+    alert("🚀 مبروك! هذا الدوري الآن ضمن 'نخبة الأبطال'. تم إزاحة كافة القيود وبناء جسور التميز.");
+    location.reload(); 
+}
+// دالة لجلب "موجز النخبة" والترويج له
+async function showEliteBrief() {
+    const response = await fetch(`${baseURL}.json`);
+    const allLeagues = await response.json();
+    
+    let briefHTML = `<div class="glass-card" style="border: 2px solid var(--gold);">
+                        <h3 style="color:var(--gold); font-size:16px;">💎 موجز أبطال النخبة</h3>`;
+
+    for (let id in allLeagues) {
+        if (allLeagues[id].config && allLeagues[id].config.status === "ELITE_CHAMPIONS") {
+            const stats = allLeagues[id].stats || { goals: 0, teams: 0 };
+            briefHTML += `
+                <div class="elite-item" style="padding:10px; border-bottom:1px solid #333;">
+                    <span style="color:var(--gold);">🏆 ${id}</span>: 
+                    سُجل ${stats.goals} أهداف | المشاركون: ${stats.teams} فرق
+                </div>`;
+        }
+    }
+    briefHTML += `</div>`;
+    document.getElementById('elite-showcase').innerHTML = briefHTML;
+}
