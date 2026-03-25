@@ -15,7 +15,91 @@
         <h1 id="main-title">PRO COACH v2 🛡️</h1>
         <p style="color: #ccc;">إدارة الفرق والخطط التكتيكية</p>
     </div>
+<style>
+    /* التنسيق العام للمنصة الملكية */
+    :root {
+        --gold: #d4af37;
+        --deep-green: #0d3d29;
+        --royal-blue: #1e40af;
+        --glass: rgba(255, 255, 255, 0.08);
+    }
 
+    body {
+        background: linear-gradient(135deg, var(--deep-green) 0%, #1a4d2e 100%);
+        color: white;
+        font-family: 'Cairo', sans-serif;
+        margin: 0;
+        min-height: 100vh;
+    }
+
+    /* تصميم موجز النخبة (التوليد والترويج) */
+    #elite-showcase {
+        margin-bottom: 20px;
+        transition: all 0.5s ease;
+    }
+
+    .glass-card {
+        background: var(--glass);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* تصميم "الكلمة الحاسمة" للمشرف */
+    #admin-setup-area {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 15px;
+        border: 1px dashed var(--gold);
+    }
+
+    /* الملعب التكتيكي (غرفة العمليات) */
+    #tactics-board {
+        cursor: crosshair;
+        box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+        overflow: hidden;
+    }
+
+    .player-dot {
+        width: 35px;
+        height: 35px;
+        background: var(--gold);
+        border: 2px solid white;
+        border-radius: 50%;
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: black;
+        font-weight: bold;
+        font-size: 14px;
+        cursor: move;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        z-index: 10;
+    }
+
+    /* الأزرار الاحترافية */
+    .btn {
+        background: linear-gradient(145deg, var(--gold), #b8962d);
+        color: #0d3d29;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+    }
+
+    .hidden { display: none !important; }
+</style>
     <div id="login-screen" class="glass-card">
         <label>كود الدوري / الغرفة</label>
         <input type="text" id="leagueCode" placeholder="مثال: SALALAH-2026">
