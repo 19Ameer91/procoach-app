@@ -1,109 +1,94 @@
-// دالة إنشاء الدوري بـ "الكلمة الحاسمة" للمشرف
-async function createLeagueContract() {
-    const leagueID = document.getElementById('leagueCode').value.toUpperCase();
-    const targetTeams = document.getElementById('targetTeams').value; // الرقم الحاسم
-    const isAdminPaid = false; // افتراضياً باقة عادية
-
-    if (!targetTeams || targetTeams < 2) {
-        alert("يا قائد، يجب تحديد عدد فرق منطقي (2 فأكثر)!");
-        return;
-    }
-
-    const leagueContract = {
-        config: {
-            totalTeams: targetTeams, // الكلمة الحاسمة للمشرف
-            status: "PRE-START", // حالة ما قبل البداية (تسمح بالترقية)
-            isElite: isAdminPaid,
-            createdAt: new Date().toLocaleString(),
-            lockCount: true // قفل العدد الكلي
-        }
+<script>
+    // 1. الإعدادات والروابط الأساسية (البوصلة الرقمية) 📡
+    const baseURL = "https://procoach-40d9f-default-rtdb.firebaseio.com/leagues/";
+    
+    // إعدادات Firebase (تأكد من مطابقتها لإعدادات مشروعك الأصلي)
+    const firebaseConfig = {
+        apiKey: "AIzaSyD5RA1lebNnSUB9vw1iYir5PYEPRxqKqtM",
+        authDomain: "procoach-8029d.firebaseapp.com",
+        databaseURL: "https://procoach-8029d-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "procoach-8029d",
+        storageBucket: "procoach-8029d.firebasestorage.app",
+        messagingSenderId: "225403732660",
+        appId: "1:225403732660:web:df0638d89d3c86dc0b0de1"
     };
 
-    // حفظ العقد في Firebase
-    await fetch(`${baseURL}${leagueID}/contract.json`, { method: 'PUT', body: JSON.stringify(leagueContract) });
-    
-    alert(`🛡️ تم اعتماد الميدان! الكلمة الحاسمة هي ${targetTeams} فرق. بياناتك في أمان ولن تُحذف أبداً.`);
-}
-
-// دالة ترقية الباقة (تتم فقط قبل البداية)
-async function upgradePackage(leagueID) {
-    const response = await fetch(`${baseURL}${leagueID}/contract/status.json`);
-    const status = await response.json();
-
-    if (status === "PRE-START") {
-        // تنفيذ عملية الترقية لخدمات النخبة
-        alert("🚀 جاري فتح 'جسور النخبة' لك.. يمكنك الآن الاستمتاع بالخدمات المدفوعة.");
-    } else {
-        alert("❌ عذراً يا قائد، الدوري بدأ فعلياً! لا يمكن تغيير الباقة بعد صافرة الانطلاق.");
+    // تشغيل محركات Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
     }
-}
-    // 🏟️ الدخول للميدان بعد التحقق
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('tactics-screen').classList.remove('hidden');
-    document.getElementById('main-title').innerText = `دوري: ${league}`;
-    
-    setupPlayers(); // تشغيل لوحة التكتيك
-}
-async function checkLeagueStatus(leagueID) {
-    const url = `https://procoach-40d9f-default-rtdb.firebaseio.com/leagues/${leagueID}.json`;
-    const response = await fetch(url);
-    const leagueData = await response.json();
+    const auth = firebase.auth();
+    const database = firebase.database();
 
-    // 1. التحقق من حصانة الـ VIP
-    if (leagueData.isVIP) {
-        console.log("هذا الدوري تحت حماية VIP 👑");
-        return;
-    }
+    // متغيرات الحالة العامة
+    let currentUser = null;
+    let currentLeagueID = null;
 
-    // 2. التحقق من عدد الفرق (المجلدات الفرعية تحت الدوري)
-    const teamsCount = Object.keys(leagueData.teams || {}).length;
+    // 2. نظام إنشاء الدوري (الكلمة الحاسمة للمشرف) 🛡️
+    async function createLeagueContract() {
+        const leagueID = document.getElementById('leagueCode').value.toUpperCase();
+        const targetTeams = document.getElementById('targetTeams').value; 
 
-    if (teamsCount >= 12) {
-        alert("مبروك يا قائد! اكتملت الفرق (12/12). تم تثبيت بيانات الدوري رسمياً بواسطة فريق جافا 🛡️");
-        // تحديث الحالة في Firebase لتصبح "Fixed"
-        await fetch(`${url}/status.json`, { method: 'PUT', body: JSON.stringify("APPROVED") });
-    } else {
-        const timeRemaining = calculateDeadline(leagueData.createdAt);
-        if (timeRemaining <= 0) {
-            alert("للأسف، انقضت المهلة ولم يكتمل العدد. جاري تنظيف السيرفر وحذف البيانات المؤقتة 🗑️");
-            await fetch(url, { method: 'DELETE' }); // الحذف التلقائي
+        if (!leagueID || !targetTeams || targetTeams < 2) {
+            alert("يا قائد، المعلومات ناقصة! يرجى تحديد الكود وعدد الفرق.");
+            return;
+        }
+
+        const leagueContract = {
+            config: {
+                totalTeams: targetTeams, // الكلمة الحاسمة التي لا تتغير
+                status: "PRE-START", // حالة تسمح بالترقية قبل صافرة البداية
+                isVIP: false,
+                createdAt: new Date().toLocaleString(),
+                lockCount: true 
+            }
+        };
+
+        try {
+            await fetch(`${baseURL}${leagueID}/contract.json`, { method: 'PUT', body: JSON.stringify(leagueContract) });
+            alert(`✅ تم اعتماد الميدان! الكلمة الحاسمة هي ${targetTeams} فرق. بياناتك محمية للأبد.`);
+        } catch (error) {
+            console.error("خطأ في إنشاء العقد:", error);
         }
     }
-}
-async function upgradeToElite(leagueID) {
-    const url = `https://procoach-40d9f-default-rtdb.firebaseio.com/leagues/${leagueID}/config.json`;
-    
-    const eliteConfig = {
-        status: "ELITE_CHAMPIONS", // الحالة الجديدة 🏆
-        isVIP: true,
-        deadline: "REMOVED", // إزاحة الشروط
-        features: "FULL_ACCESS", // جسور الشروط الجديدة
-        badge: "GOLDEN_SHIELD"
-    };
 
-    await fetch(url, { method: 'PATCH', body: JSON.stringify(eliteConfig) });
-    
-    alert("🚀 مبروك! هذا الدوري الآن ضمن 'نخبة الأبطال'. تم إزاحة كافة القيود وبناء جسور التميز.");
-    location.reload(); 
-}
-// دالة لجلب "موجز النخبة" والترويج له
-async function showEliteBrief() {
-    const response = await fetch(`${baseURL}.json`);
-    const allLeagues = await response.json();
-    
-    let briefHTML = `<div class="glass-card" style="border: 2px solid var(--gold);">
-                        <h3 style="color:var(--gold); font-size:16px;">💎 موجز أبطال النخبة</h3>`;
+    // 3. نظام "نخبة الأبطال" والترويج (التوليد) 💎
+    async function upgradeToElite(leagueID) {
+        const url = `${baseURL}${leagueID}/config.json`;
+        const eliteConfig = {
+            status: "ELITE_CHAMPIONS",
+            isVIP: true,
+            deadline: "REMOVED", // إزاحة القيود
+            features: "FULL_ACCESS", // بناء جسور الشروط
+            badge: "GOLDEN_SHIELD"
+        };
 
-    for (let id in allLeagues) {
-        if (allLeagues[id].config && allLeagues[id].config.status === "ELITE_CHAMPIONS") {
-            const stats = allLeagues[id].stats || { goals: 0, teams: 0 };
-            briefHTML += `
-                <div class="elite-item" style="padding:10px; border-bottom:1px solid #333;">
-                    <span style="color:var(--gold);">🏆 ${id}</span>: 
-                    سُجل ${stats.goals} أهداف | المشاركون: ${stats.teams} فرق
-                </div>`;
+        try {
+            await fetch(url, { method: 'PATCH', body: JSON.stringify(eliteConfig) });
+            alert("🚀 مبروك! انضممت لنخبة الأبطال. تم إزاحة كافة القيود وبناء جسور التميز.");
+            location.reload();
+        } catch (error) {
+            alert("خطأ في الترقية، حاول مرة أخرى.");
         }
     }
-    briefHTML += `</div>`;
-    document.getElementById('elite-showcase').innerHTML = briefHTML;
-}
+
+    // 4. دالة عرض "موجز النخبة" (الترويج التلقائي) 📺
+    async function showEliteBrief() {
+        try {
+            const response = await fetch(`${baseURL}.json`);
+            const allLeagues = await response.json();
+            const showcase = document.getElementById('elite-showcase');
+            
+            if (!showcase) return;
+
+            let briefHTML = `<div class="card" style="border: 2px solid #d4af37; background: rgba(255, 215, 0, 0.05); border-radius:15px; padding:15px;">
+                                <h3 style="color:#d4af37; text-align:center; font-size:18px;">💎 موجز أبطال النخبة</h3>`;
+
+            let hasElite = false;
+            if (allLeagues) {
+                for (let id in allLeagues) {
+                    if (allLeagues[id].config && allLeagues[id].config.status === "ELITE_CHAMPIONS") {
+                        hasElite = true;
+                        const stats = allLeagues[id].stats || { goals: 0, teams: 0 };
+                        briefHTML += `
+                            <div style="padding:12px; border-bottom:1px solid rgba(212,175,55,0.
