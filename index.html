@@ -4,102 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pro Coach - القائد أمير 🛡️</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     
     <style>
-        :root { --gold: #d4af37; --deep-green: #0d3d29; --glass: rgba(255, 255, 255, 0.07); }
-        * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body
+        /* 🎨 التنسيق الاحترافي للمنصة الملكية */
+        :root {
+            --gold: #d4af37;
+            --deep-green: #0d3d29;
+            --royal-blue: #1e40af;
+            --glass: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--deep-green) 0%, #1a4d2e 100%);
+            color: white;
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header { text-align: center; padding: 20px; }
+        .header h1 { color: var(--gold); margin: 0; }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        #tactics-board {
+            width: 100%;
+            height: 400px;
+            background-color: #2d6a4f;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Football_field.svg/1200px-Football_field.svg.png');
+            background-size: cover;
+            border: 2px solid white;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .player-node {
+            width: 35px; height: 35px;
+            background: var(--gold);
+            color: black;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; position: absolute; cursor: move;
+            border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+
+        input, select, button {
+            width: 100%; padding: 12px; margin: 10px 0;
+            border-radius: 10px; border: 1px solid var(--gold);
+            background: rgba(0,0,0,0.3); color: white;
+        }
+
+        button { background: var(--gold); color: black; font-weight: bold; border: none; cursor: pointer; }
+        button:hover { background: #b8962d; }
+
+        .hidden { display: none !important; }
+        #elite-showcase { width: 90%; max-width: 500px; }
+    </style>
+</head>
+<body>
+
     <div class="header">
-        <h1 id="main-title">PRO COACH v2 🛡️</h1>
+        <h1>PRO COACH v2 🛡️</h1>
         <p style="color: #ccc;">إدارة الفرق والخطط التكتيكية</p>
     </div>
-<style>
-    /* التنسيق العام للمنصة الملكية */
-    :root {
-        --gold: #d4af37;
-        --deep-green: #0d3d29;
-        --royal-blue: #1e40af;
-        --glass: rgba(255, 255, 255, 0.08);
-    }
 
-    body {
-        background: linear-gradient(135deg, var(--deep-green) 0%, #1a4d2e 100%);
-        color: white;
-        font-family: 'Cairo', sans-serif;
-        margin: 0;
-        min-height: 100vh;
-    }
+    <div id="elite-showcase"></div>
 
-    /* تصميم موجز النخبة (التوليد والترويج) */
-    #elite-showcase {
-        margin-bottom: 20px;
-        transition: all 0.5s ease;
-    }
-
-    .glass-card {
-        background: var(--glass);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        border-radius: 20px;
-        padding: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-
-    /* تصميم "الكلمة الحاسمة" للمشرف */
-    #admin-setup-area {
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 10px;
-        padding: 15px;
-        margin-top: 15px;
-        border: 1px dashed var(--gold);
-    }
-
-    /* الملعب التكتيكي (غرفة العمليات) */
-    #tactics-board {
-        cursor: crosshair;
-        box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
-        overflow: hidden;
-    }
-
-    .player-dot {
-        width: 35px;
-        height: 35px;
-        background: var(--gold);
-        border: 2px solid white;
-        border-radius: 50%;
-        position: absolute;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: black;
-        font-weight: bold;
-        font-size: 14px;
-        cursor: move;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        z-index: 10;
-    }
-
-    /* الأزرار الاحترافية */
-    .btn {
-        background: linear-gradient(145deg, var(--gold), #b8962d);
-        color: #0d3d29;
-        border: none;
-        padding: 12px 25px;
-        border-radius: 10px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    .btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
-    }
-
-    .hidden { display: none !important; }
-</style>
     <div id="login-screen" class="glass-card">
         <label>كود الدوري / الغرفة</label>
         <input type="text" id="leagueCode" placeholder="مثال: SALALAH-2026">
@@ -109,101 +98,111 @@
             <option value="COACH">مدرب الفريق</option>
             <option value="PLAYER">لاعب</option>
         </select>
-        <button onclick="startApp()">تفعيل وفتح اللوحة ⚡</button>
+        <button onclick="startApp()">دخول الميدان ⚡</button>
     </div>
-<div id="elite-showcase"></div>
+
+    <div id="league-setup" class="glass-card hidden">
+        <h3 style="color: var(--gold); text-align: center;">إعدادات الميدان الجديد 🛡️</h3>
+        <label>عدد الفرق (الكلمة الحاسمة):</label>
+        <input type="number" id="targetTeams" value="12" min="4" max="32" oninput="updateDeadlineText()">
+        <div id="deadline-info" style="font-size: 13px; color: #ccc; margin: 10px 0;">
+            المهلة الزمنية: <span id="daysCount" style="color: var(--gold); font-weight: bold;">6</span> أيام
+        </div>
+        <button onclick="createOfficialLeague()">تنشيط كود الدوري ⚡</button>
+    </div>
+
     <div id="tactics-screen" class="glass-card hidden">
         <h2 style="color: var(--gold); text-align: center;">غرفة التكتيك 📋</h2>
-        <p style="text-align: center; font-size: 12px;">اسحب اللاعبين لتغيير الخطة التكتيكية</p>
-        
-        <div id="tactics-board">
-            </div>
-
-        <button onclick="saveTactics()" style="margin-top: 20px;">حفظ الخطة الحالية 💾</button>
-        <button onclick="showDashboard()" style="background: transparent; border: 1px solid var(--gold); color: var(--gold);">كشوفات اللاعبين 📋</button>
+        <div id="tactics-board"></div>
+        <button onclick="saveTactics()" style="margin-top: 20px;">حفظ الخطة 💾</button>
+        <button onclick="location.reload()" style="background: transparent; color: var(--gold);">خروج 🚪</button>
     </div>
 
     <script>
-        // دمج التقنيات الجديدة مع تطبيقك
+        const baseURL = "https://procoach-40d9f-default-rtdb.firebaseio.com/leagues/";
+
+        // 1. تشغيل التطبيق
         function startApp() {
             const league = document.getElementById('leagueCode').value;
+            const role = document.getElementById('role').value;
             if(!league) return alert("أدخل كود الدوري!");
-            
+
             document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('tactics-screen').classList.remove('hidden');
             
+            if(role === "ADMIN") {
+                document.getElementById('league-setup').classList.remove('hidden');
+            } else {
+                document.getElementById('tactics-screen').classList.remove('hidden');
+                setupPlayers();
+            }
+        }
+
+        // 2. تحديث المهلة ديناميكياً
+        function updateDeadlineText() {
+            const teams = document.getElementById('targetTeams').value;
+            const days = Math.ceil(teams / 3) + 2;
+            document.getElementById('daysCount').innerText = days;
+        }
+
+        // 3. إنشاء الدوري (الكلمة الحاسمة)
+        async function createOfficialLeague() {
+            const leagueID = document.getElementById('leagueCode').value.toUpperCase();
+            const teams = document.getElementById('targetTeams').value;
+            
+            const config = { target: teams, status: "PENDING", createdAt: new Date().getTime() };
+            await fetch(`${baseURL}${leagueID}/config.json`, { method: 'PUT', body: JSON.stringify(config) });
+            
+            alert("تم اعتماد الكلمة الحاسمة! الميدان جاهز.");
+            document.getElementById('league-setup').classList.add('hidden');
+            document.getElementById('tactics-screen').classList.remove('hidden');
             setupPlayers();
         }
-<div id="league-setup" class="glass-card">
-    <h3 style="color: var(--gold);">إعدادات الميدان الجديد 🛡️</h3>
-    
-    <label>حدد عدد الفرق المستهدفة:</label>
-    <input type="number" id="targetTeams" value="12" min="4" max="32" oninput="updateDeadlineText()">
-    
-    <div id="deadline-info" style="font-size: 13px; color: #ccc; margin: 10px 0;">
-        المهلة الزمنية الممنوحة: <span id="daysCount" style="color: var(--gold); font-weight: bold;">5</span> أيام
-    </div>
 
-    <p style="font-size: 11px; color: #ff4444;">⚠️ تنبيه: إذا لم يكتمل العدد المطلوب خلال المهلة، سيتم حذف البيانات تلقائياً (إلا لحاملي VIP).</p>
-    
-    <button onclick="createOfficialLeague()">تنشيط كود الدوري ⚡</button>
-</div>
-
-<script>
-    function updateDeadlineText() {
-        const teams = document.getElementById('targetTeams').value;
-        // معادلة ديناميكية: يوم واحد لكل 3 فرق + يومين إضافيين للتحضير
-        const days = Math.ceil(teams / 3) + 2;
-        document.getElementById('daysCount').innerText = days;
-    }
-
-    async function createOfficialLeague() {
-        const teams = document.getElementById('targetTeams').value;
-        const days = Math.ceil(teams / 3) + 2;
-        const leagueID = document.getElementById('leagueCode').value;
-
-        const leagueConfig = {
-            target: teams,
-            deadlineDays: days,
-            createdAt: new Date().getTime(),
-            status: "PENDING",
-            isVIP: false // افتراضي
-        };
-
-        // حفظ الإعدادات في Firebase تحت كود الدوري
-        await fetch(`${baseURL}${leagueID}/config.json`, { method: 'PUT', body: JSON.stringify(leagueConfig) });
-        alert(`تم فتح الغرفة! أمامك ${days} أيام لجمع ${teams} فريقاً.`);
-    }
-</script>
-        // إنشاء لاعبين قابلين للسحب والإفلات
+        // 4. نظام السحب والإفلات في الملعب
         function setupPlayers() {
             const board = document.getElementById('tactics-board');
+            board.innerHTML = ""; // تنظيف الملعب
             for(let i=1; i<=11; i++) {
                 const dot = document.createElement('div');
                 dot.className = 'player-node';
                 dot.innerText = i;
-                dot.style.top = (Math.random() * 80) + "%";
-                dot.style.left = (Math.random() * 80) + "%";
-                
-                // إضافة خاصية السحب
+                dot.style.top = (20 + Math.random() * 60) + "%";
+                dot.style.left = (10 + Math.random() * 80) + "%";
+
                 let isDragging = false;
-                dot.onmousedown = (e) => isDragging = true;
+                dot.onmousedown = (e) => { isDragging = true; dot.style.zIndex = 1000; };
                 window.onmousemove = (e) => {
                     if(isDragging) {
                         const rect = board.getBoundingClientRect();
-                        dot.style.left = (e.clientX - rect.left - 15) + "px";
-                        dot.style.top = (e.clientY - rect.top - 15) + "px";
+                        let x = e.clientX - rect.left - 17;
+                        let y = e.clientY - rect.top - 17;
+                        dot.style.left = x + "px";
+                        dot.style.top = y + "px";
                     }
                 };
                 window.onmouseup = () => isDragging = false;
-                
                 board.appendChild(dot);
             }
         }
 
-        function saveTactics() {
-            alert("تم حفظ الخطة التكتيكية في السحابة بنجاح يا قائد!");
+        function saveTactics() { alert("تم حفظ الخطة في السحابة بنجاح يا قائد!"); }
+
+        // 5. موجز النخبة (التوليد)
+        async function showEliteBrief() {
+            const res = await fetch(`${baseURL}.json`);
+            const data = await res.json();
+            if(data) {
+                let html = `<div class="glass-card" style="border-color:var(--gold)"><h3>💎 أبطال النخبة</h3>`;
+                for(let id in data) {
+                    if(data[id].config && data[id].config.status === "ELITE_CHAMPIONS") {
+                        html += `<p>🏆 ${id} - متاح الآن</p>`;
+                    }
+                }
+                html += `</div>`;
+                document.getElementById('elite-showcase').innerHTML = html;
+            }
         }
+        showEliteBrief();
     </script>
 </body>
 </html>
