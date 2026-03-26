@@ -2,57 +2,34 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>GFA SOVEREIGN - PRO COACH</title>
-    
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
+    <title>GFA TEST 🛡️</title>
     <style>
-        body { margin: 0; font-family: sans-serif; background: #0d3d29; color: white; text-align: center; }
-        #gate { position: fixed; inset: 0; background: #0d3d29; z-index: 999; display: flex; justify-content: center; align-items: center; }
-        .box { background: white; color: black; padding: 30px; border-radius: 15px; width: 300px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-        .go-btn { background: #059669; color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-weight: bold; border-radius: 5px; font-size: 18px; }
-        #field { display: none; padding: 20px; background: #f0f2f5; color: black; min-height: 100vh; }
+        body { background: #0d3d29; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
+        .card { background: white; color: black; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .btn { background: #059669; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; }
     </style>
 </head>
-
 <body>
 
-    <div id="gate">
-        <div class="box">
-            <h2 style="color: #059669;">GFA SOVEREIGN</h2>
-            <input type="text" id="L_CODE" placeholder="كود الدوري">
-            <input type="text" id="U_NAME" placeholder="اسمك">
-            <button class="go-btn" onclick="OPEN_GATE()">دخول الميدان ⚡</button>
-        </div>
+    <div id="login_gate" class="card">
+        <h2 style="color: #059669;">تطبيق برو كوتش</h2>
+        <p>اضغط الزر بالأسفل لاختبار الدخول</p>
+        <button class="btn" onclick="TEST_GO()">دخول الميدان الآن ⚡</button>
     </div>
 
-    <div id="field">
-        <h1>مرحباً بك في الميدان 🏟️</h1>
-        <p>الدوري: <span id="view_code"></span></p>
-        <button onclick="location.reload()">خروج</button>
+    <div id="success_field" style="display:none; text-align:center;">
+        <h1>✅ تم الاقتحام بنجاح!</h1>
+        <p>يا قائد أمير، إذا رأيت هذه الرسالة فالمحرك يعمل.</p>
+        <button onclick="location.reload()" style="color:white; background:red; padding:10px; border:none; border-radius:5px;">خروج</button>
     </div>
 
     <script>
-        function OPEN_GATE() {
-            // أخذ البيانات
-            const code = document.getElementById('L_CODE').value;
-            const name = document.getElementById('U_NAME').value;
-
-            if(code == "" || name == "") {
-                alert("يا قائد، املأ الخانات!");
-                return;
-            }
-
-            // ⚡ الأمر السحري لفتح الباب (تغيير الـ CSS برمجياً)
-            document.getElementById('gate').style.display = 'none';
-            document.getElementById('field').style.display = 'block';
-            document.getElementById('view_code').innerText = code;
-            
-            console.log("تم فتح البوابة بنجاح!");
+        function TEST_GO() {
+            // إخفاء البوابة وإظهار رسالة النجاح فورا
+            document.getElementById('login_gate').style.display = 'none';
+            document.getElementById('success_field').style.display = 'block';
+            alert("تم تفعيل المحرك بنجاح!");
         }
     </script>
-
 </body>
 </html>
