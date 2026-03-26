@@ -2,212 +2,57 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GFA - PRO COACH 🛡️</title>
+    <title>GFA SOVEREIGN - PRO COACH</title>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        :root { --gold: #d4af37; --green: #059669; --dark: #0d3d29; }
-        * { box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-        body { background: #f0f2f5; margin: 0; direction: rtl; text-align: right; overflow-x: hidden; }
-
-        /* شاشة الدخول - القوة القصوى */
-        #loginOverlay { position: fixed; inset: 0; background: #0d3d29; z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-card { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
-        
-        /* التطبيق الرئيسي */
-        .header { background: linear-gradient(135deg, #1e40af, #059669); color: white; padding: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .nav { background: #1f2937; display: flex; justify-content: center; sticky: top; }
-        .nav-link { color: #9ca3af; padding: 15px; cursor: pointer; border: none; background: none; font-weight: bold; font-size: 14px; }
-        .nav-link.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
-
-        .main-content { max-width: 900px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        
-        /* ملعب التكتيك */
-        #pitch { width: 100%; height: 400px; background: #2e7d32; border: 3px solid white; position: relative; border-radius: 10px; overflow: hidden; }
-        .player { width: 30px; height: 30px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; cursor: move; border: 2px solid white; font-weight: bold; font-size: 11px; color: black; z-index: 50; }
-
-        .btn-action { background: var(--green); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; font-size: 16px; }
-        .hidden { display: none !important; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
+        body { margin: 0; font-family: sans-serif; background: #0d3d29; color: white; text-align: center; }
+        #gate { position: fixed; inset: 0; background: #0d3d29; z-index: 999; display: flex; justify-content: center; align-items: center; }
+        .box { background: white; color: black; padding: 30px; border-radius: 15px; width: 300px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        .go-btn { background: #059669; color: white; border: none; padding: 15px; width: 100%; cursor: pointer; font-weight: bold; border-radius: 5px; font-size: 18px; }
+        #field { display: none; padding: 20px; background: #f0f2f5; color: black; min-height: 100vh; }
     </style>
 </head>
+
 <body>
 
-<div id="loginOverlay">
-    <div class="login-card">
-        <h2 style="color: var(--green); margin-bottom: 5px;">🏆 GFA SOVEREIGN</h2>
-        <p style="font-size: 12px; color: #666; margin-bottom: 20px;">نظام القائد أمير الاحترافي</p>
-        
-        <input type="text" id="L_CODE" placeholder="كود الدوري (مثال: GFA-1)">
-        <input type="text" id="U_NAME" placeholder="اسمك الكامل">
-        <select id="U_ROLE">
-            <option value="ADMIN">مشرف (قائد الدوري) 🛡️</option>
-            <option value="COACH">مدرب فريق 📋</option>
-            <option value="PLAYER">لاعب كرة قدم ⚽</option>
-        </select>
-        
-        <button class="btn-action" onclick="forceEntry()">دخول الميدان الآن ⚡</button>
-    </div>
-</div>
-
-<div id="appContainer" class="hidden">
-    <div class="header">
-        <h2 id="leagueTitle">PRO COACH</h2>
-    </div>
-
-    <nav class="nav">
-        <button class="nav-link active" onclick="switchTab('home')">🏠 الرئيسية</button>
-        <button class="nav-link" onclick="switchTab('team')">👥 الفريق</button>
-        <button class="nav-link" onclick="switchTab('tactics')">📐 التكتيك</button>
-        <button class="nav-link" id="adminTab" onclick="switchTab('admin')">⚙️ الإدارة</button>
-        <button class="nav-link" onclick="location.reload()" style="color: #ff4444;">🚪 خروج</button>
-    </nav>
-
-    <div class="main-content">
-        <div id="home" class="page">
-            <div class="card">
-                <h3>📊 ملخص الميدان</h3>
-                <p>أهلاً بك يا قائد: <span id="userSpan" style="color: #1e40af; font-weight: bold;"></span></p>
-            </div>
-        </div>
-
-        <div id="team" class="page hidden">
-            <div class="card">
-                <h3>إضافة لاعب ➕</h3>
-                <input type="text" id="pName" placeholder="الاسم">
-                <input type="number" id="pNum" placeholder="الرقم">
-                <button class="btn-action" onclick="saveToFirebase()">حفظ اللاعب ✅</button>
-            </div>
-            <div class="card">
-                <table>
-                    <thead><tr><th>الاسم</th><th>الرقم</th><th>حذف</th></tr></thead>
-                    <tbody id="playerData"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="tactics" class="page hidden">
-            <div class="card" style="background: #222;">
-                <h3 style="color: white; text-align: center;">غرفة التكتيك 📋</h3>
-                <div id="pitch"></div>
-                <button class="btn-action" style="background: var(--gold); color: black;" onclick="drawPitch()">إعادة توزيع اللاعبين 🔄</button>
-            </div>
-        </div>
-
-        <div id="admin" class="page hidden">
-            <div class="card">
-                <h3>تثبيت الكلمة الحاسمة 🛡️</h3>
-                <input type="number" id="tCount" value="12">
-                <button class="btn-action" onclick="alert('🛡️ تم التثبيت!')">اعتماد العدد ✍️</button>
-            </div>
+    <div id="gate">
+        <div class="box">
+            <h2 style="color: #059669;">GFA SOVEREIGN</h2>
+            <input type="text" id="L_CODE" placeholder="كود الدوري">
+            <input type="text" id="U_NAME" placeholder="اسمك">
+            <button class="go-btn" onclick="OPEN_GATE()">دخول الميدان ⚡</button>
         </div>
     </div>
-</div>
 
-<script>
-    // 🚩 إعدادات Firebase
-    const fbConfig = {
-        apiKey: "AIzaSyD5RA1lebNnSUB9vw1iYir5PYEPRxqKqtM",
-        databaseURL: "https://procoach-8029d-default-rtdb.europe-west1.firebasedatabase.app",
-    };
-    
-    // محاولة التشغيل
-    try {
-        firebase.initializeApp(fbConfig);
-    } catch(e) { console.log("Firebase Waiting..."); }
+    <div id="field">
+        <h1>مرحباً بك في الميدان 🏟️</h1>
+        <p>الدوري: <span id="view_code"></span></p>
+        <button onclick="location.reload()">خروج</button>
+    </div>
 
-    const db = firebase.database();
-    let currentL = "";
+    <script>
+        function OPEN_GATE() {
+            // أخذ البيانات
+            const code = document.getElementById('L_CODE').value;
+            const name = document.getElementById('U_NAME').value;
 
-    // ⚡ دالة الاقتحام (تفتح الباب مهما حدث)
-    function forceEntry() {
-        const code = document.getElementById('L_CODE').value.trim().toUpperCase();
-        const name = document.getElementById('U_NAME').value.trim();
-        const role = document.getElementById('U_ROLE').value;
+            if(code == "" || name == "") {
+                alert("يا قائد، املأ الخانات!");
+                return;
+            }
 
-        if(!code || !name) { alert("أدخل البيانات يا قائد!"); return; }
-
-        currentL = code;
-        document.getElementById('userSpan').innerText = name;
-        document.getElementById('leagueTitle').innerText = "دوري: " + code;
-        
-        if(role !== "ADMIN") document.getElementById('adminTab').style.display = "none";
-
-        // إخفاء فوري لشاشة الدخول
-        document.getElementById('loginOverlay').style.display = "none";
-        document.getElementById('appContainer').classList.remove('hidden');
-        
-        loadFromFB();
-    }
-
-    function switchTab(id) {
-        document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-        if(id === 'tactics') drawPitch();
-    }
-
-    // إدارة البيانات
-    function saveToFirebase() {
-        const n = document.getElementById('pName').value;
-        const num = document.getElementById('pNum').value;
-        if(!n) return;
-        db.ref('leagues/' + currentL + '/players').push({ name: n, num: num });
-        document.getElementById('pName').value = "";
-        document.getElementById('pNum').value = "";
-    }
-
-    function loadFromFB() {
-        try {
-            db.ref('leagues/' + currentL + '/players').on('value', (s) => {
-                const list = document.getElementById('playerData');
-                list.innerHTML = "";
-                s.forEach((c) => {
-                    list.innerHTML += `<tr><td>${c.val().name}</td><td>${c.val().num}</td><td onclick="del('${c.key}')" style="color:red; cursor:pointer;">❌</td></tr>`;
-                });
-            });
-        } catch(e) {}
-    }
-
-    function del(id) { db.ref('leagues/' + currentL + '/players/' + id).remove(); }
-
-    // رسم الملعب وتحريك اللاعبين
-    function drawPitch() {
-        const pitch = document.getElementById('pitch');
-        pitch.innerHTML = "";
-        for(let i=1; i<=11; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'player';
-            dot.innerText = i;
-            dot.style.top = "50%"; dot.style.left = (i * 8) + "%";
+            // ⚡ الأمر السحري لفتح الباب (تغيير الـ CSS برمجياً)
+            document.getElementById('gate').style.display = 'none';
+            document.getElementById('field').style.display = 'block';
+            document.getElementById('view_code').innerText = code;
             
-            let isMoving = false;
-            dot.onmousedown = (e) => { isMoving = true; e.preventDefault(); };
-            window.onmousemove = (e) => {
-                if(isMoving) {
-                    const r = pitch.getBoundingClientRect();
-                    dot.style.left = (e.clientX - r.left - 15) + "px";
-                    dot.style.top = (e.clientY - r.top - 15) + "px";
-                }
-            };
-            window.onmouseup = () => isMoving = false;
-
-            // دعم اللمس للجوال
-            dot.ontouchmove = (e) => {
-                const r = pitch.getBoundingClientRect();
-                dot.style.left = (e.touches[0].clientX - r.left - 15) + "px";
-                dot.style.top = (e.touches[0].clientY - r.top - 15) + "px";
-            };
-
-            pitch.appendChild(dot);
+            console.log("تم فتح البوابة بنجاح!");
         }
-    }
-</script>
+    </script>
+
 </body>
 </html>
