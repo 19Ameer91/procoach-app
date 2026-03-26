@@ -2,33 +2,144 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>GFA TEST 🛡️</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GFA SOVEREIGN - PRO COACH</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
     <style>
-        body { background: #0d3d29; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
-        .card { background: white; color: black; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .btn { background: #059669; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; }
+        :root { --gold: #d4af37; --green: #059669; --dark: #0d3d29; }
+        body { margin: 0; font-family: 'Cairo', sans-serif; background: #f0f2f5; direction: rtl; }
+        
+        /* شاشة الدخول المضمونة */
+        #gate { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .box { background: white; padding: 30px; border-radius: 15px; width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* الواجهة الرئيسية */
+        .header { background: linear-gradient(135deg, #1e40af, #059669); color: white; padding: 15px; text-align: center; }
+        .nav { background: #1f2937; display: flex; justify-content: space-around; }
+        .nav-btn { color: #9ca3af; padding: 15px; cursor: pointer; border: none; background: none; font-weight: bold; }
+        .nav-btn.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
+
+        .card { background: white; border-radius: 12px; padding: 20px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        #pitch { width: 100%; height: 400px; background: #2e7d32; border: 3px solid white; position: relative; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        .player { width: 30px; height: 30px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; cursor: move; border: 2px solid white; font-weight: bold; font-size: 11px; color: black; z-index: 10; }
+
+        .btn { background: var(--green); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; }
+        .hidden { display: none !important; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div id="login_gate" class="card">
-        <h2 style="color: #059669;">تطبيق برو كوتش</h2>
-        <p>اضغط الزر بالأسفل لاختبار الدخول</p>
-        <button class="btn" onclick="TEST_GO()">دخول الميدان الآن ⚡</button>
+    <div id="gate">
+        <div class="box">
+            <h2 style="color: var(--green);">GFA SOVEREIGN</h2>
+            <input type="text" id="L_CODE" placeholder="كود الدوري">
+            <input type="text" id="U_NAME" placeholder="اسمك الكامل">
+            <button class="btn" onclick="ACTIVATE()">دخول الميدان ⚡</button>
+        </div>
     </div>
 
-    <div id="success_field" style="display:none; text-align:center;">
-        <h1>✅ تم الاقتحام بنجاح!</h1>
-        <p>يا قائد أمير، إذا رأيت هذه الرسالة فالمحرك يعمل.</p>
-        <button onclick="location.reload()" style="color:white; background:red; padding:10px; border:none; border-radius:5px;">خروج</button>
+    <div id="arena" class="hidden">
+        <div class="header">
+            <h2 id="title">PRO COACH</h2>
+            <p>أهلاً بك يا <span id="userDisp"></span></p>
+        </div>
+        <nav class="nav">
+            <button class="nav-btn active" onclick="tab('t1')">👥 الفريق</button>
+            <button class="nav-btn" onclick="tab('t2')">📐 التكتيك</button>
+            <button class="nav-btn" onclick="tab('t3')">⚙️ الإدارة</button>
+            <button class="nav-btn" onclick="location.reload()" style="color:red">🚪 خروج</button>
+        </nav>
+
+        <div id="t1" class="page">
+            <div class="card">
+                <h3>إضافة لاعب ➕</h3>
+                <input type="text" id="pName" placeholder="الاسم">
+                <input type="number" id="pNum" placeholder="الرقم">
+                <button class="btn" onclick="saveP()">حفظ ✅</button>
+            </div>
+            <div class="card">
+                <table>
+                    <thead><tr><th>الاسم</th><th>الرقم</th><th>حذف</th></tr></thead>
+                    <tbody id="pList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="t2" class="page hidden">
+            <div class="card" style="background:#222;">
+                <h3 style="color:white; text-align:center;">غرفة التكتيك 📐</h3>
+                <div id="pitch"></div>
+            </div>
+        </div>
+
+        <div id="t3" class="page hidden">
+            <div class="card">
+                <h3>الكلمة الحاسمة 🛡️</h3>
+                <input type="number" id="target" value="12">
+                <button class="btn" onclick="alert('🛡️ تم التثبيت!')">تثبيت العدد</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        function TEST_GO() {
-            // إخفاء البوابة وإظهار رسالة النجاح فورا
-            document.getElementById('login_gate').style.display = 'none';
-            document.getElementById('success_field').style.display = 'block';
-            alert("تم تفعيل المحرك بنجاح!");
+        // المحرك الأساسي
+        function ACTIVATE() {
+            const code = document.getElementById('L_CODE').value.toUpperCase();
+            const name = document.getElementById('U_NAME').value;
+            if(!code || !name) return alert("أكمل البيانات!");
+
+            // الاقتحام الفوري
+            document.getElementById('gate').classList.add('hidden');
+            document.getElementById('arena').classList.remove('hidden');
+            document.getElementById('userDisp').innerText = name;
+            document.getElementById('title').innerText = "دوري: " + code;
+            
+            initFB(code);
+        }
+
+        function tab(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 't2') loadPitch();
+        }
+
+        // ربط السحاب
+        function initFB(c) {
+            const conf = { databaseURL: "https://procoach-8029d-default-rtdb.europe-west1.firebasedatabase.app" };
+            if(!firebase.apps.length) firebase.initializeApp(conf);
+            firebase.database().ref('leagues/'+c+'/players').on('value', (s) => {
+                const b = document.getElementById('pList'); b.innerHTML = "";
+                s.forEach(child => {
+                    b.innerHTML += `<tr><td>${child.val().name}</td><td>${child.val().num}</td><td onclick="delP('${child.key}')" style="color:red;cursor:pointer">❌</td></tr>`;
+                });
+            });
+        }
+
+        function saveP() {
+            const n = document.getElementById('pName').value;
+            const num = document.getElementById('pNum').value;
+            const c = document.getElementById('L_CODE').value.toUpperCase();
+            if(n) firebase.database().ref('leagues/'+c+'/players').push({name:n, num:num});
+            document.getElementById('pName').value = ""; document.getElementById('pNum').value = "";
+        }
+
+        function delP(id) { 
+            const c = document.getElementById('L_CODE').value.toUpperCase();
+            firebase.database().ref('leagues/'+c+'/players/'+id).remove(); 
+        }
+
+        function loadPitch() {
+            const pitch = document.getElementById('pitch'); pitch.innerHTML = "";
+            for(let i=1; i<=11; i++) {
+                const p = document.createElement('div'); p.className = 'player'; p.innerText = i;
+                p.style.top = "50%"; p.style.left = (i*8)+"%";
+                pitch.appendChild(p);
+            }
         }
     </script>
 </body>
