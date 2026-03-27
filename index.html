@@ -3,166 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GFA SOVEREIGN - الميدان الشامل v6</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
+    <title>GFA SOVEREIGN - PRO TACTICS 🛡️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --pitch: #2e7d32; }
+        :root { --gold: #d4af37; --pitch: #2e7d32; --white: rgba(255,255,255,0.85); --panel-bg: rgba(0,0,0,0.85); }
         body { margin: 0; font-family: 'Cairo', sans-serif; background: #1a1a1a; color: white; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
         
-        /* شريط الأدوات */
-        .toolbar { background: #222; padding: 10px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; border-bottom: 2px solid var(--gold); }
-        .btn { background: #444; color: white; border: 1px solid var(--gold); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .btn:hover { background: var(--gold); color: black; }
-        .btn-play { background: #059669 !important; border: none; }
+        /* 🛡️ الهوية البصرية (الشعار) */
+        #gfa-brand { position: absolute; top: 15px; left: 15px; z-index: 1000; text-align: center; pointer-events: none; }
+        #gfa-brand h1 { font-family: 'Cairo', sans-serif; font-weight: 900; font-size: 24px; color: var(--gold); margin: 0; text-shadow: 0 4px 8px rgba(0,0,0,0.6); }
+        #gfa-brand p { font-size: 10px; color: var(--white); margin: 0; letter-spacing: 1px; }
 
-        /* الميدان */
-        #pitch-area { flex: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center; }
+        /* 🛠️ شريط الأدوات العلوي المطور */
+        #tactical-toolbar { 
+            background: var(--panel-bg); padding: 12px; display: flex; 
+            gap: 10px; flex-wrap: wrap; justify-content: center; border-bottom: 3px solid var(--gold); 
+            z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .tool-btn { 
+            background: #444; color: white; border: 1px solid var(--gold); 
+            padding: 9px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; font-family: 'Cairo', sans-serif; transition: all 0.2s ease;
+        }
+        .tool-btn:hover { background: var(--gold); color: black; transform: translateY(-2px); }
+        .tool-btn.btn-danger { background: #8b0000; border-color: #ff4444; }
+        .tool-btn.btn-danger:hover { background: #ff4444; }
+        .tool-btn.btn-play { background: #059669 !important; border: 1px solid #fff; animation: pulse 1s infinite; }
+
+        /* 🏟️ الميدان الخرافي v7 */
+        #arena-container { flex: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center; background: #111; }
         #pitch { 
-            width: 92%; max-width: 750px; height: 85%; background: var(--pitch); 
-            border: 4px solid white; border-radius: 8px; position: relative; overflow: hidden;
-            background-image: linear-gradient(to bottom, transparent 49.5%, white 50%, white 50.5%, transparent 51%);
+            width: 95%; max-width: 800px; height: 90%; background: var(--pitch); 
+            border: 5px solid var(--white); border-radius: 8px; position: relative; overflow: hidden;
+            box-shadow: 0 0 60px rgba(0,0,0,0.7);
+            /* رسم النجيل المخطط برمجياً لضمان الاحترافية */
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,0,0,0.03) 40px, rgba(0,0,0,0.03) 80px),
+                             linear-gradient(to bottom, transparent 49.5%, var(--white) 50%, var(--white) 50.5%, transparent 51%);
         }
-        canvas { position: absolute; top: 0; left: 0; z-index: 5; touch-action: none; }
 
-        /* اللاعب والكرة */
-        .player { 
-            position: absolute; width: 34px; height: 34px; background: var(--gold); 
-            border-radius: 50%; border: 2px solid white; display: flex; 
-            align-items: center; justify-content: center; font-weight: bold; 
-            color: black; cursor: move; z-index: 100; font-size: 14px; box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-        }
-        #ball { 
-            position: absolute; width: 20px; height: 20px; background: white; 
-            border-radius: 50%; border: 2px solid black; z-index: 50; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-        }
+        /* 🎨 طبقة الرسم التكتيكي (الكانفاس) */
+        #canvas-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; touch-action: none; cursor: crosshair; }
+
+        /* 🏀 الكرة تفاعليةv7 */
+        #football { position: absolute; width: 22px; height: 22px; background: white; border-radius: 50%; border: 2px solid black; cursor: move; z-index: 90; box-shadow: 0 4px 10px rgba(0,0,0,0.6); display: none; }
+
+        /* مناطق الجزاء والزوايا */
+        .penalty-area { position: absolute; width: 44%; height: 18%; border: 3px solid var(--white); left: 28%; z-index: 2; }
+        .pa-top { top: 0; border-top: none; } .pa-bottom { bottom: 0; border-bottom: none; }
+        .goal-box { position: absolute; width: 22%; height: 6%; border: 3px solid var(--white); left: 39%; z-index: 1; background: rgba(255,255,255,0.1); }
         
-        /* خطوط إضافية */
-        .penalty { position: absolute; width: 40%; height: 18%; border: 2px solid white; left: 30%; }
-        .top { top: 0; border-top: none; } .bottom { bottom: 0; border-bottom: none; }
+        /* ⚽ اللاعبv7 مع الاسم */
+        .player-unit { position: absolute; display: flex; flex-direction: column; align-items: center; z-index: 100; touch-action: none; cursor: move; transition: transform 0.2s ease, box-shadow 0.2s; }
+        .player-unit:active { transform: scale(1.1); z-index: 200; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .p-circle { width: 36px; height: 36px; background: var(--gold); border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-weight: bold; color: black; box-shadow: 0 5px 15px rgba(0,0,0,0.4); font-size: 14px; }
+        .p-name { background: rgba(0,0,0,0.8); color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; margin-bottom: 3px; white-space: nowrap; border: 1px solid var(--gold); font-weight: bold; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="toolbar">
-    <select id="formation" class="btn" onchange="applyFormation()">
-        <option value="442">4-4-2</option>
-        <option value="433">4-3-3</option>
-        <option value="352">3-5-2</option>
-    </select>
-    <button class="btn" onclick="setMode('arrow')">📏 سهم</button>
-    <button class="btn" onclick="clearDraw()">🗑️ مسح الرسم</button>
-    <button class="btn btn-play" onclick="simulateArc()">▶️ تنفيذ هجمة ساقطة</button>
-</div>
-
-<div id="pitch-area">
-    <div id="pitch">
-        <canvas id="canvas"></canvas>
-        <div class="penalty top"></div>
-        <div class="penalty bottom"></div>
-        <div id="ball" style="top:50%; left:50%;"></div>
+    <div id="gfa-brand">
+        <h1>GFA</h1>
+        <p>SOVEREIGN v7</p>
     </div>
-</div>
 
-<script>
-    let canvas = document.getElementById('canvas');
-    let ctx = canvas.getContext('2d');
-    let lastArrow = null;
-    let isDrawing = false;
-    let startX, startY;
+    <div id="tactical-toolbar">
+        <select id="formation" class="tool-btn" onchange="loadFormation()">
+            <option value="">🏁 التشكيلات العالمية</option>
+            <option value="442">4-4-2 Classic</option>
+            <option value="433">4-3-3 Attack</option>
+            <option value="352">3-5-2 Control</option>
+        </select>
+        <button class="tool-btn" onclick="setDrawMode('arrow')">📏 رسم سهم تكتيكي</button>
+        <button class="tool-btn" onclick="toggleFootball()">🏀 تفعيل الكرة</button>
+        <button class="tool-btn btn-danger" onclick="clearCanvas()">🗑️ مسح الرسم</button>
+        <button id="playBtn" class="tool-btn btn-play" onclick="playTactic()">▶️ تنفيذ الهجمة (محاكاة)</button>
+    </div>
 
-    window.onload = () => {
-        resize();
-        initPlayers();
-    };
+    <div id="arena-container">
+        <div id="pitch">
+            <canvas id="canvas-layer"></canvas>
+            
+            <div class="goal-box" style="top:0;"></div>
+            <div class="penalty-area pa-top"></div>
+            
+            <div class="goal-box" style="bottom:0;"></div>
+            <div class="penalty-area pa-bottom"></div>
+            
+            <div style="position:absolute; top:50%; left:50%; width:110px; height:110px; border:3px solid var(--white); border-radius:50%; transform:translate(-50%, -50%); z-index: 2;"></div>
+            
+            <div id="football"></div>
+        </div>
+    </div>
 
-    function resize() {
-        canvas.width = document.getElementById('pitch').clientWidth;
-        canvas.height = document.getElementById('pitch').clientHeight;
-    }
+    <script>
+        const canvas = document.getElementById('canvas-layer');
+        const ctx = canvas.getContext('2d');
+        const ball = document.getElementById('football');
+        let isDrawing = false;
+        let lastArrow = null; // تخزين مسار الحركة
+        let mode = 'idle'; // idle, arrow
 
-    // --- رسم السهم التكتيكي ---
-    canvas.onmousedown = canvas.ontouchstart = (e) => {
-        isDrawing = true;
-        let r = canvas.getBoundingClientRect();
-        startX = (e.clientX || e.touches[0].clientX) - r.left;
-        startY = (e.clientY || e.touches[0].clientY) - r.top;
-    };
+        window.onload = () => { resizeCanvas(); initPlayers(); };
+        window.onresize = resizeCanvas;
 
-    canvas.onmouseup = canvas.ontouchend = (e) => {
-        if(!isDrawing) return;
-        let r = canvas.getBoundingClientRect();
-        let endX = (e.clientX || (e.changedTouches ? e.changedTouches[0].clientX : startX)) - r.left;
-        let endY = (e.clientY || (e.changedTouches ? e.changedTouches[0].clientY : startY)) - r.top;
-        
-        ctx.clearRect(0,0,canvas.width, canvas.height);
-        drawArrow(startX, startY, endX, endY);
-        lastArrow = {x1:startX, y1:startY, x2:endX, y2:endY};
-        isDrawing = false;
-    };
-
-    function drawArrow(x1, y1, x2, y2) {
-        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
-        ctx.strokeStyle = "yellow"; ctx.lineWidth = 4; ctx.stroke();
-        let angle = Math.atan2(y2-y1, x2-x1);
-        ctx.lineTo(x2-15*Math.cos(angle-Math.PI/6), y2-15*Math.sin(angle-Math.PI/6));
-        ctx.moveTo(x2, y2);
-        ctx.lineTo(x2-15*Math.cos(angle+Math.PI/6), y2-15*Math.sin(angle+Math.PI/6));
-        ctx.stroke();
-    }
-
-    // --- محرك الكرة الساقطة ---
-    function simulateArc() {
-        if(!lastArrow) return;
-        let p = 0;
-        let b = document.getElementById('ball');
-        let move = () => {
-            if(p <= 1) {
-                let x = lastArrow.x1 + (lastArrow.x2 - lastArrow.x1) * p;
-                let y = lastArrow.y1 + (lastArrow.y2 - lastArrow.y1) * p;
-                let h = 80 * Math.sin(Math.PI * p); // تأثير الارتفاع
-                b.style.left = (x - 10) + "px";
-                b.style.top = (y - 10 - h) + "px";
-                b.style.transform = `scale(${1 + h/100})`;
-                p += 0.02;
-                requestAnimationFrame(move);
-            } else { b.style.transform = "scale(1)"; }
-        };
-        move();
-    }
-
-    // --- نظام الـ 11 لاعباً ---
-    function initPlayers() {
-        let pArea = document.getElementById('pitch');
-        for(let i=1; i<=11; i++) {
-            let p = document.createElement('div');
-            p.className = 'player'; p.innerText = i;
-            p.style.left = (i*7) + "%"; p.style.top = "20%";
-            makeDraggable(p, pArea);
-            pArea.appendChild(p);
+        function resizeCanvas() {
+            const pitch = document.getElementById('pitch');
+            canvas.width = pitch.clientWidth;
+            canvas.height = pitch.clientHeight;
         }
-    }
 
-    function makeDraggable(el, container) {
-        let dragging = false;
-        let start = () => dragging = true;
-        let stop = () => dragging = false;
-        let move = (e) => {
-            if(!dragging) return;
-            let r = container.getBoundingClientRect();
-            let x = (e.clientX || e.touches[0].clientX) - r.left;
-            let y = (e.clientY || e.touches[0].clientY) - r.top;
-            el.style.left = (x - 17) + "px";
-            el.style.top = (y - 17) + "px";
+        // --- 1. نظام الـ 11 لاعباً وتوزيع الأبطالv7 ---
+        const playerNames = ["الحارس", "دفاع 1", "دفاع 2", "ظهير يمين", "ظهير يسار", "وسط 1", "وسط 2", "جناح يمين", "جناح يسار", "هجوم 1", "هجوم 2"];
+
+        function initPlayers() {
+            const pitch = document.getElementById('pitch');
+            // لا نحذف مناطق الجزاء، فقط نحذف اللاعبين القدامى
+            document.querySelectorAll('.player-unit').forEach(el => el.remove());
+            
+            for(let i=0; i<11; i++) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'player-unit';
+                wrapper.innerHTML = `<span class="player-name">${playerNames[i]}</span><div class="p-circle">${i+1}</div>`;
+                wrapper.style.top = "50%"; wrapper.style.left = (10 + (i*7)) + "%"; // توزيع مبدئي
+                makeDraggable(wrapper, pitch);
+                pitch.appendChild(wrapper);
+            }
+        }
+
+        const formations = {
+            '442': [{t:5,l:44.5},{t:22,l:35},{t:22,l:54},{t:25,l:15},{t:25,l:74},{t:48,l:35},{t:48,l:54},{t:52,l:10},{t:52,l:79},{t:78,l:35},{t:78,l:54}],
+            '433': [{t:5,l:44.5},{t:22,l:35},{t:22,l:54},{t:25,l:15},{t:25,l:74},{t:50,l:44.5},{t:50,l:25},{t:50,l:64},{t:80,l:44.5},{t:80,l:15},{t:80,l:74}]
         };
-        el.onmousedown = el.ontouchstart = start;
-        window.addEventListener('mousemove', move);
-        window.addEventListener('touchmove', move, {passive:false});
-        window.addEventListener('mouseup', stop);
-        window.addEventListener('touchend', stop);
-    }
 
-    function clearDraw() { ctx.clearRect(0,0,canvas.width, canvas.height); lastArrow=null; }
-</script>
+        function loadFormation() {
+            const f = document.getElementById('formation').value;
+            if(!f || !formations[f]) return;
+            const players = document.querySelectorAll('.player-unit');
+            const pitch = document.getElementById('pitch').getBoundingClientRect();
+            
+            formations[f].forEach((pos, i) => {
+                if(players[i]) {
+                    players[i].style.top = (pos.t / 100) * pitch.height + "px";
+                    players[i].style.left = (pos.l / 100) * pitch.width + "px";
+                }
+            });
+        }
+
+        // --- 2. نظام الرسم التكتيكي الساحر ---
+        function setDrawMode(m) { mode = m; alert(`📏 تم تفعيل مود: ${m === 'arrow' ? 'رسم سهم تمرير' : 'حركة حرة'}`); }
+        function clearCanvas() { ctx.clearRect(0,0,canvas.width, canvas.height); lastArrow=null; }
+
+        let startX, startY;
+        canvas.addEventListener('mousedown', (e) => startDraw(e));
+        canvas.addEventListener('mousemove', (e) => draw(e));
+        canvas.addEventListener('mouseup', (e) => stopDraw(e));
+        canvas.addEventListener('touchstart', (e) => startDraw(e.touches[0]));
+        canvas.addEventListener('touchmove', (e) => draw(e.touches[0]));
+        canvas.addEventListener('touchend', (e) => stopDraw(e.changedTouches[0]));
+
+        function startDraw(e) {
+            if(mode !== 'arrow') return;
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            startX = (e.clientX || e.pageX) - rect.left;
+            startY = (e.clientY || e.pageY) - rect.top;
+        }
+
+        function draw(e) { if(!isDrawing) return; } // لا نرسم شيئاً أثناء السحب
+
+        function stopDraw(e) {
+            if(mode !== 'arrow' || !isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const cx = (e.clientX || e.pageX) - rect.left;
+            const cy = (e.clientY || e.pageY) - rect.top;
+            
+            // رسم سهم تكتيكي برأس مدبب
+            drawTacticalArrow(startX, startY, cx, cy);
+            lastArrow = { x1: startX, y1: startY, x2: cx, y2: cy };
+            isDrawing = false;
+        }
+
+        function drawTacticalArrow(x1, y1, x2, y2) {
+            ctx.clearRect(0,0,canvas.width, canvas.height); // مسح لرسم سهم جديد
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+            ctx.strokeStyle = "rgba(212,175,55,1)"; // ذهبي تكتيكي
+            ctx.lineWidth = 4; ctx.stroke();
+            const angle = Math.atan2(y2-y1, x2-x1);
+            ctx.lineTo(x2-15*Math.cos(angle-Math.PI/6), y2-15*Math.sin(angle-Math.PI/6));
+            ctx.moveTo(x2, y2);
+            ctx.lineTo(x2-15*Math.cos(angle+Math.PI/6), y2-15*Math.sin(angle+Math.PI/6));
+            ctx.stroke();
+        }
+
+        // --- 3. نظام المحاكاة (الكرة الساقطة والتفاعلية)v7 ---
+        function toggleFootball() { ball.style.display = (ball.style.display === "none" ? "block" : "none"); makeElementDraggable(ball, document.getElementById('pitch')); }
+
+        function playTactic() {
+            if(!lastArrow) return alert("يا قائد علي، ارسم سهم تمرير أولاً!");
+            let progress = 0; const speed = 0.015;
+            let animate = () => {
+                if (progress <= 1) {
+                    const x = lastArrow.x1 + (lastArrow.x2 - lastArrow.x1) * progress;
+                    const y = lastArrow.y1 + (lastArrow.y2 - lastArrow.y1) * progress;
+                    const offset = 80 * Math.sin(Math.PI * progress); // تأثير "النطة" الساقطة
+                    ball.style.left = (x - 11) + "px";
+                    ball.style.top = (y - 11 - offset) + "px";
+                    ball.style.transform = `scale(${1 + offset/120})`; // تكبير الكرة عند الارتفاع
+                    progress += speed;
+                    requestAnimationFrame(animate);
+                } else { ball.style.transform = "scale(1)"; }
+            }; animate();
+        }
+
+        function makeElementDraggable(elm, container) {
+            let p1, p2, p3, p4;
+            elm.onmousedown = elm.ontouchstart = (e) => { e.stopPropagation(); dragStart(e); }; // منع تداخل السحب مع الرسم
+
+            function dragStart(e) {
+                p3 = e.clientX || e.touches[0].clientX;
+                p4 = e.clientY || e.touches[0].clientY;
+                document.onmouseup = document.ontouchend = () => { document.onmouseup = null; document.onmousemove = null; document.ontouchend = null; document.ontouchmove = null; };
+                document.onmousemove = document.ontouchmove = (e) => {
+                    let cx = e.clientX || e.touches[0].clientX;
+                    let cy = e.clientY || e.touches[0].clientY;
+                    p1 = p3 - cx; p2 = p4 - cy; p3 = cx; p4 = cy;
+                    let newT = elm.offsetTop - p2, newL = elm.offsetLeft - p1;
+                    const rect = container.getBoundingClientRect();
+                    // قيد الحركة داخل الملعب (مع الاسم)
+                    if (newT >= 0 && newT <= rect.height - 55) elm.style.top = newT + "px";
+                    if (newL >= 0 && newL <= rect.width - 45) elm.style.left = newL + "px";
+                };
+            }
+        }
+        function makeDraggable(el, container) { makeElementDraggable(el, container); } // مرجع قديم
+    </script>
 </body>
 </html>
