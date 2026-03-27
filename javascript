@@ -43,7 +43,22 @@
                 lockCount: true 
             }
         };
+function forceEntry() {
+        // ... (كود جلب البيانات الأصلي)
 
+        // 🛡️ التعديل الذكي للقائد علي:
+        if(role === "ADMIN") {
+            // المشرف يذهب مباشرة لتبويب الإدارة
+            document.getElementById('adminTab').classList.remove('hidden');
+            switchTab('adminPage'); // ⚡ هذا هو الأمر الذي يفتح صفحة الإدارة فوراً
+        } else {
+            // المدرب واللاعب يذهبون لتبويب الفريق
+            document.getElementById('adminTab').classList.add('hidden');
+            switchTab('teamPage');
+        }
+        
+        // ... (بقية كود تحميل البيانات)
+    }
         try {
             await fetch(`${baseURL}${leagueID}/contract.json`, { method: 'PUT', body: JSON.stringify(leagueContract) });
             alert(`✅ تم اعتماد الميدان! الكلمة الحاسمة هي ${targetTeams} فرق. بياناتك محمية للأبد.`);
