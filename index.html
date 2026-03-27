@@ -3,144 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GFA SOVEREIGN - الميدان الاحترافي</title>
+    <title>GFA SOVEREIGN - الميدان الملكي 🏟️</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --green: #059669; --dark: #0d3d29; }
-        body { margin: 0; font-family: 'Cairo', sans-serif; background: #f0f2f5; direction: rtl; }
+        :root { --gold: #d4af37; --pitch-green: #2e7d32; }
+        body { margin: 0; font-family: 'Cairo', sans-serif; background: #1a1a1a; color: white; }
         .hidden { display: none !important; }
-        
-        /* 🏟️ تحويل المنصة لملعب كرة قدم حقيقي (رسم برمجى) */
+
+        /* 🏟️ الميدان الخرافي (نجيل + خطوط + شبك) */
         #pitch { 
-            width: 100%; height: 450px; background: #2e7d32; 
-            border: 4px solid white; border-radius: 10px; 
-            position: relative; overflow: hidden; margin: 15px auto;
-            /* رسم خطوط الملعب */
+            width: 95%; max-width: 800px; height: 500px; 
+            background: var(--pitch-green); 
+            border: 5px solid white; border-radius: 5px; 
+            margin: 20px auto; position: relative; overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            /* رسم النجيل المخطط والخطوط البيضاء */
             background-image: 
-                linear-gradient(to bottom, transparent 49%, white 49%, white 51%, transparent 51%),
-                radial-gradient(circle, transparent 19%, white 19%, white 21%, transparent 21%);
-            background-size: 100% 100%, 150px 150px;
-            background-position: center; background-repeat: no-repeat;
+                repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0,0,0,0.05) 50px, rgba(0,0,0,0.05) 100px),
+                linear-gradient(to bottom, transparent 49%, white 49.5%, white 50.5%, transparent 51%), /* خط المنتصف */
+                radial-gradient(circle, white 2px, transparent 2px); /* نقطة السنتر */
         }
 
-        /* ⚽ تصميم اللاعبين */
-        .player { 
-            width: 35px; height: 35px; background: var(--gold); 
-            color: black; border-radius: 50%; display: flex; 
-            align-items: center; justify-content: center; 
-            position: absolute; cursor: move; border: 2px solid white; 
-            font-weight: bold; font-size: 14px; z-index: 100;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            touch-action: none; /* لمنع اهتزاز الصفحة في الجوال */
+        /* 🥅 منطقة الجزاء والشبك (المرمى) */
+        .penalty-area {
+            position: absolute; width: 40%; height: 20%;
+            border: 3px solid white; left: 30%;
+        }
+        .top-goal { top: 0; border-top: none; } /* المرمى العلوي */
+        .bottom-goal { bottom: 0; border-bottom: none; } /* المرمى السفلي */
+        
+        .goal-net {
+            position: absolute; width: 20%; height: 5%;
+            background: rgba(255,255,255,0.2); border: 2px solid white;
+            left: 40%; z-index: 1;
         }
 
-        .card { background: white; border-radius: 12px; padding: 20px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #1e40af, #059669); color: white; padding: 15px; text-align: center; }
-        .btn { background: var(--green); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
+        /* ⚽ اللاعب مع الاسم فوقه */
+        .player-wrapper {
+            position: absolute; display: flex; flex-direction: column;
+            align-items: center; cursor: move; z-index: 100; touch-action: none;
+        }
+        .player-circle {
+            width: 35px; height: 35px; background: var(--gold);
+            border-radius: 50%; border: 2px solid white;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: black; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        .player-name {
+            background: rgba(0,0,0,0.7); color: white; font-size: 10px;
+            padding: 2px 6px; border-radius: 4px; margin-bottom: 2px;
+            white-space: nowrap; border: 1px solid var(--gold);
+        }
+
+        .btn { background: #059669; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; }
     </style>
 </head>
 <body>
 
-    <div id="gate" style="position:fixed; inset:0; background:var(--dark); z-index:9999; display:flex; justify-content:center; align-items:center;">
-        <div style="background:white; padding:30px; border-radius:15px; width:320px; text-align:center;">
-            <h2 style="color:var(--green);">GFA SOVEREIGN</h2>
+    <div id="gate" style="position:fixed; inset:0; background:#0d3d29; z-index:9999; display:flex; justify-content:center; align-items:center;">
+        <div style="background:#fff; padding:30px; border-radius:15px; width:320px; text-align:center;">
+            <h2 style="color:#059669;">GFA SOVEREIGN</h2>
             <input type="text" id="L_CODE" placeholder="كود الدوري">
             <input type="text" id="U_NAME" placeholder="اسمك الكامل">
-            <button class="btn" onclick="ACTIVATE()">دخول الميدان ⚡</button>
+            <button class="btn" onclick="ACTIVATE()">دخول الميدان الخرافي ⚡</button>
         </div>
     </div>
 
     <div id="arena" class="hidden">
-        <div class="header">
-            <h2 id="title">دوري: </h2>
-            <p>القائد: <span id="userDisp"></span></p>
-        </div>
+        <h2 style="text-align:center; color:var(--gold); margin-top:10px;">📐 غرفة التكتيك السيادية</h2>
         
-        <div class="card" style="background:#222;">
-            <h3 style="color:white; text-align:center;">غرفة التكتيك 📐</h3>
-            <div id="pitch"></div>
-            <button class="btn" style="background:var(--gold); color:black;" onclick="loadPitch()">إعادة رص الصفوف 🔄</button>
+        <div id="pitch">
+            <div class="goal-net" style="top:0; border-bottom: 1px dashed white;"></div>
+            <div class="penalty-area top-goal"></div>
+            
+            <div class="penalty-area bottom-goal"></div>
+            <div class="goal-net" style="bottom:0; border-top: 1px dashed white;"></div>
+
+            <div style="position:absolute; top:50%; left:50%; width:120px; height:120px; border:3px solid white; border-radius:50%; transform:translate(-50%, -50%);"></div>
+        </div>
+
+        <div style="padding:20px;">
+            <button class="btn" onclick="loadPitch()">إعادة توزيع الأبطال 🔄</button>
         </div>
     </div>
 
     <script>
         function ACTIVATE() {
-            const code = document.getElementById('L_CODE').value.toUpperCase();
             const name = document.getElementById('U_NAME').value;
-            if(!code || !name) return alert("أكمل البيانات!");
-
+            if(!name) return alert("أدخل اسمك!");
             document.getElementById('gate').classList.add('hidden');
             document.getElementById('arena').classList.remove('hidden');
-            document.getElementById('userDisp').innerText = name;
-            document.getElementById('title').innerText = "دوري: " + code;
-            
             loadPitch();
         }
 
+        const playerNames = ["الحارس", "دفاع 1", "دفاع 2", "ظهير", "ظهير", "وسط", "وسط", "جناح", "جناح", "هجوم 1", "هجوم 2"];
+
         function loadPitch() {
             const pitch = document.getElementById('pitch');
-            pitch.innerHTML = ""; 
+            // لا نحذف مناطق الجزاء، فقط نحذف اللاعبين القدامى
+            document.querySelectorAll('.player-wrapper').forEach(el => el.remove());
             
-            for(let i=1; i<=11; i++) {
-                const p = document.createElement('div');
-                p.className = 'player';
-                p.innerText = i;
+            for(let i=0; i<11; i++) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'player-wrapper';
                 
-                // توزيع اللاعبين بشكل أولي
-                p.style.top = "45%";
-                p.style.left = (i * 8) + "%";
+                // إضافة الاسم فوق اللاعب
+                const nameTag = document.createElement('span');
+                nameTag.className = 'player-name';
+                nameTag.innerText = playerNames[i];
                 
-                // تفعيل السحب لكل لاعب بشكل مستقل
-                makeElementDraggable(p, pitch);
+                // دائرة اللاعب
+                const circle = document.createElement('div');
+                circle.className = 'player-circle';
+                circle.innerText = i + 1;
+
+                wrapper.appendChild(nameTag);
+                wrapper.appendChild(circle);
                 
-                pitch.appendChild(p);
+                wrapper.style.top = (20 + (i*6)) + "%";
+                wrapper.style.left = (10 + (i*7)) + "%";
+                
+                makeDraggable(wrapper, pitch);
+                pitch.appendChild(wrapper);
             }
         }
 
-        // محرك السحب الشامل لجميع اللاعبين
-        function makeElementDraggable(elm, container) {
+        function makeDraggable(elm, container) {
             let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            elm.onmousedown = elm.ontouchstart = dragStart;
 
-            elm.onmousedown = dragMouseDown;
-            elm.ontouchstart = dragMouseDown;
-
-            function dragMouseDown(e) {
+            function dragStart(e) {
                 e.preventDefault();
                 pos3 = e.clientX || e.touches[0].clientX;
                 pos4 = e.clientY || e.touches[0].clientY;
-                document.onmouseup = closeDragElement;
-                document.ontouchend = closeDragElement;
-                document.onmousemove = elementDrag;
-                document.ontouchmove = elementDrag;
+                document.onmouseup = document.ontouchend = closeDrag;
+                document.onmousemove = document.ontouchmove = elementDrag;
             }
 
             function elementDrag(e) {
-                e.preventDefault();
-                let clientX = e.clientX || e.touches[0].clientX;
-                let clientY = e.clientY || e.touches[0].clientY;
+                let cx = e.clientX || e.touches[0].clientX;
+                let cy = e.clientY || e.touches[0].clientY;
+                pos1 = pos3 - cx; pos2 = pos4 - cy;
+                pos3 = cx; pos4 = cy;
                 
-                pos1 = pos3 - clientX;
-                pos2 = pos4 - clientY;
-                pos3 = clientX;
-                pos4 = clientY;
-
-                let newTop = elm.offsetTop - pos2;
-                let newLeft = elm.offsetLeft - pos1;
-
-                // قيد الحركة داخل حدود الملعب
+                let newT = elm.offsetTop - pos2;
+                let newL = elm.offsetLeft - pos1;
+                
                 const rect = container.getBoundingClientRect();
-                if (newTop >= 0 && newTop <= rect.height - 35) elm.style.top = newTop + "px";
-                if (newLeft >= 0 && newLeft <= rect.width - 35) elm.style.left = newLeft + "px";
+                if (newT >= 0 && newT <= rect.height - 50) elm.style.top = newT + "px";
+                if (newL >= 0 && newL <= rect.width - 40) elm.style.left = newL + "px";
             }
 
-            function closeDragElement() {
-                document.onmouseup = null;
-                document.onmousemove = null;
-                document.ontouchend = null;
-                document.ontouchmove = null;
+            function closeDrag() {
+                document.onmouseup = null; document.onmousemove = null;
+                document.ontouchend = null; document.ontouchmove = null;
             }
         }
     </script>
