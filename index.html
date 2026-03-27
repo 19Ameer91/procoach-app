@@ -2,201 +2,177 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GFA TITAN v10 | المحرك السيادي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GFA TITAN v11 | المحرك السيادي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --pitch: #1a5e1a; --white: rgba(255,255,255,0.9); }
-        body { margin: 0; font-family: 'Cairo', sans-serif; background: #0a0a0a; color: white; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-
-        /* 🛡️ الهوية البصرية الملكية */
-        #brand { position: absolute; top: 20px; left: 25px; z-index: 100; pointer-events: none; }
-        #brand h1 { font-size: 32px; font-weight: 900; color: var(--gold); margin: 0; letter-spacing: 2px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
-        #brand span { font-size: 12px; color: #aaa; text-transform: uppercase; border-top: 1px solid var(--gold); }
-
-        /* 🏟️ محرك العرض السينمائي (Perspective) */
-        #world { flex: 1; perspective: 1500px; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #1a1a1a 0%, #000 100%); }
+        :root { --gold: #d4af37; --pitch: #228B22; }
+        body { margin: 0; font-family: 'Cairo', sans-serif; background: #000; color: white; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
         
+        /* 🛠️ شريط الأدوات السينمائي السفلي */
+        .dock { background: rgba(20,20,20,0.95); padding: 15px; display: flex; justify-content: space-around; border-top: 2px solid var(--gold); z-index: 1000; }
+        .dock-btn { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #888; transition: 0.3s; }
+        .dock-btn:hover, .dock-btn.active { color: var(--gold); transform: translateY(-5px); }
+        .dock-btn span { font-size: 10px; margin-top: 5px; font-weight: bold; }
+        .play-btn { color: #059669 !important; }
+
+        /* 🏟️ الميدان التفاعلي */
+        #arena { flex: 1; position: relative; perspective: 1500px; display: flex; justify-content: center; align-items: center; background: #111; }
         #pitch { 
-            width: 90vw; max-width: 900px; height: 60vh; background: var(--pitch); 
-            border: 6px solid white; border-radius: 4px; position: relative;
-            transform-style: preserve-3d; transform: rotateX(25deg); /* الزاوية السينمائية */
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            background-image: repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(0,0,0,0.1) 60px, rgba(0,0,0,0.1) 120px);
+            width: 90%; max-width: 800px; height: 85%; background: var(--pitch); 
+            border: 5px solid white; border-radius: 5px; position: relative; 
+            transform: rotateX(20deg); transform-style: preserve-3d;
             box-shadow: 0 50px 100px rgba(0,0,0,0.7);
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,0,0,0.05) 40px, rgba(0,0,0,0.05) 80px);
         }
 
-        /* 🎨 طبقة الرسم التكتيكي */
-        #draw-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; touch-action: none; }
+        canvas { position: absolute; top: 0; left: 0; z-index: 10; touch-action: none; pointer-events: none; }
+        #interaction-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; }
 
-        /* ⚽ اللاعبون (تصميم ثلاثي الأبعاد) */
+        /* ⚽ الأبطال والكرة */
         .player { 
-            position: absolute; width: 38px; height: 38px; background: linear-gradient(135deg, var(--gold), #8a6d3b); 
-            border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; 
-            font-weight: 900; color: black; z-index: 50; cursor: move; transform-style: preserve-3d;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4); transition: transform 0.2s;
+            position: absolute; display: flex; flex-direction: column; align-items: center; 
+            z-index: 100; cursor: move; touch-action: none; transition: transform 0.2s;
         }
-        .player::after { content: attr(data-name); position: absolute; top: -20px; background: rgba(0,0,0,0.8); color: white; font-size: 9px; padding: 2px 6px; border-radius: 3px; border: 1px solid var(--gold); white-space: nowrap; }
-
-        /* 🏀 الكرة والظل */
-        #ball { position: absolute; width: 22px; height: 22px; background: #fff; border-radius: 50%; border: 2px solid #000; z-index: 60; box-shadow: 0 2px 5px rgba(0,0,0,0.5); display: none; }
-        #ball-shadow { position: absolute; width: 22px; height: 10px; background: rgba(0,0,0,0.3); border-radius: 50%; z-index: 59; filter: blur(3px); display: none; }
-
-        /* 🛠️ شريط الأدوات السفلي الأيقوني (TacticalPad Style) */
-        .bottom-nav { background: rgba(20,20,20,0.95); padding: 15px; display: flex; justify-content: space-around; border-top: 2px solid var(--gold); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: #888; transition: 0.3s; }
-        .nav-item:hover, .nav-item.active { color: var(--gold); transform: translateY(-5px); }
-        .nav-icon { width: 24px; height: 24px; border: 2px solid currentColor; border-radius: 5px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .nav-text { font-size: 10px; font-weight: bold; }
-
-        /* مناطق الجزاء والشبك */
-        .box { position: absolute; width: 40%; height: 20%; border: 3px solid white; left: 30%; }
-        .top-box { top: 0; border-top: none; } .bot-box { bottom: 0; border-bottom: none; }
+        .p-circle { width: 34px; height: 34px; background: var(--gold); border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: black; font-weight: 900; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .p-label { background: black; font-size: 8px; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--gold); margin-bottom: 2px; }
+        
+        #ball { position: absolute; width: 22px; height: 22px; background: white; border-radius: 50%; border: 2px solid black; z-index: 150; box-shadow: 0 10px 20px rgba(0,0,0,0.5); display: none; }
     </style>
 </head>
 <body>
 
-    <div id="brand">
-        <h1>GFA TITAN</h1>
-        <span>Sovereign Engine v10.0</span>
+<div id="arena">
+    <div id="pitch">
+        <canvas id="canvas"></canvas>
+        <div id="interaction-layer"></div>
+        <div id="ball"></div>
+        <div style="position:absolute; top:0; left:30%; width:40%; height:18%; border:3px solid white; border-top:none;"></div>
+        <div style="position:absolute; bottom:0; left:30%; width:40%; height:18%; border:3px solid white; border-bottom:none;"></div>
+        <div style="position:absolute; top:50%; left:50%; width:120px; height:120px; border:3px solid white; border-radius:50%; transform:translate(-50%, -50%);"></div>
     </div>
+</div>
 
-    <div id="world">
-        <div id="pitch">
-            <canvas id="draw-layer"></canvas>
-            <div class="box top-box"></div>
-            <div class="box bot-box"></div>
-            <div id="ball-shadow"></div>
-            <div id="ball"></div>
-        </div>
-    </div>
+<div class="dock">
+    <div class="dock-btn" onclick="applyFormation('442')">🏟️<span>تشكيلة 442</span></div>
+    <div class="dock-btn" onclick="setMode('curve')">📏<span>رسم منحنى</span></div>
+    <div class="dock-btn" onclick="toggleBall()">⚽<span>الكرة</span></div>
+    <div class="dock-btn" onclick="clearAll()">🗑️<span>مسح</span></div>
+    <div class="dock-btn play-btn" onclick="runCinematic()">▶️<span>تشغيل سينمائي</span></div>
+</div>
 
-    <div class="bottom-nav">
-        <div class="nav-item" onclick="applyFormation('442')">
-            <div class="nav-icon">442</div>
-            <div class="nav-text">تشكيلة</div>
-        </div>
-        <div class="nav-item active" onclick="setTool('arrow')">
-            <div class="nav-icon">↗</div>
-            <div class="nav-text">سهم هندسي</div>
-        </div>
-        <div class="nav-item" onclick="toggleBall()">
-            <div class="nav-icon">⚽</div>
-            <div class="nav-text">الكرة</div>
-        </div>
-        <div class="nav-item" style="color: #ff4d4d;" onclick="clearDraw()">
-            <div class="nav-icon">×</div>
-            <div class="nav-text">مسح</div>
-        </div>
-        <div class="nav-item" style="color: #059669;" onclick="runCinematic()">
-            <div class="nav-icon">▶</div>
-            <div class="nav-text">تشغيل سينمائي</div>
-        </div>
-    </div>
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const ball = document.getElementById('ball');
+    const layer = document.getElementById('interaction-layer');
+    let points = []; 
+    let isDrawing = false;
+    let mode = 'curve';
 
-    <script>
-        const canvas = document.getElementById('draw-layer');
-        const ctx = canvas.getContext('2d');
-        const pitch = document.getElementById('pitch');
-        const ball = document.getElementById('ball');
-        const shadow = document.getElementById('ball-shadow');
-        let path = null;
+    window.onload = () => {
+        resize();
+        initPlayers();
+        applyFormation('442'); // رص الصفوف فوراً
+    };
 
-        window.onload = () => {
-            canvas.width = pitch.clientWidth;
-            canvas.height = pitch.clientHeight;
-            initPlayers();
-        };
+    function resize() {
+        const p = document.getElementById('pitch');
+        canvas.width = p.clientWidth; canvas.height = p.clientHeight;
+    }
 
-        // --- محرك الرسم التفاعلي ---
-        let drawing = false;
-        canvas.onmousedown = canvas.ontouchstart = (e) => {
-            drawing = true;
-            let r = canvas.getBoundingClientRect();
-            let x = (e.clientX || e.touches[0].clientX) - r.left;
-            let y = (e.clientY || e.touches[0].clientY) - r.top;
-            path = { x1: x, y1: y };
-        };
+    // --- نظام الرسم الهندسي المنحني ---
+    layer.onmousedown = layer.ontouchstart = (e) => {
+        if(mode !== 'curve') return;
+        isDrawing = true; points = [];
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+    };
 
-        canvas.onmouseup = canvas.ontouchend = (e) => {
-            if(!drawing) return;
-            let r = canvas.getBoundingClientRect();
-            let x = (e.clientX || e.changedTouches[0].clientX) - r.left;
-            let y = (e.clientY || e.changedTouches[0].clientY) - r.top;
-            path.x2 = x; path.y2 = y;
-            drawTactic(path);
-            drawing = false;
-        };
+    layer.onmousemove = layer.ontouchmove = (e) => {
+        if(!isDrawing) return;
+        const r = canvas.getBoundingClientRect();
+        const x = (e.clientX || e.touches[0].clientX) - r.left;
+        const y = (e.clientY || e.touches[0].clientY) - r.top;
+        points.push({x, y});
+        drawPath();
+    };
 
-        function drawTactic(p) {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.beginPath();
-            ctx.setLineDash([5, 5]); ctx.moveTo(p.x1, p.y1); ctx.lineTo(p.x2, p.y2);
-            ctx.strokeStyle = "rgba(212,175,55,0.8)"; ctx.lineWidth = 4; ctx.stroke();
-            ctx.setLineDash([]);
-        }
+    layer.onmouseup = layer.ontouchend = () => isDrawing = false;
 
-        // --- المحاكاة السينمائية v10 ---
-        function runCinematic() {
-            if(!path) return;
-            let p = 0;
-            ball.style.display = shadow.style.display = "block";
-            
-            // 🎥 تحريك الكاميرا (ميلان الملعب مع الكرة)
-            pitch.style.transform = "rotateX(35deg) scale(1.1) translateY(20px)";
+    function drawPath() {
+        if(points.length < 2) return;
+        ctx.beginPath(); ctx.strokeStyle = "var(--gold)"; ctx.lineWidth = 4;
+        ctx.moveTo(points[0].x, points[0].y);
+        for(let i=1; i<points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+        ctx.stroke();
+    }
 
-            function animate() {
-                if(p <= 1) {
-                    let x = path.x1 + (path.x2 - path.x1) * p;
-                    let y = path.y1 + (path.y2 - path.y1) * p;
-                    let h = 120 * Math.sin(Math.PI * p); // ارتفاع الكرة
-                    
-                    ball.style.left = (x - 11) + "px";
-                    ball.style.top = (y - 11 - h) + "px";
-                    ball.style.transform = `scale(${1 + h/100})`;
-                    
-                    shadow.style.left = (x - 11) + "px";
-                    shadow.style.top = (y - 5) + "px";
-                    shadow.style.transform = `scale(${1 - h/200})`;
-
-                    p += 0.015;
-                    requestAnimationFrame(animate);
-                } else {
-                    pitch.style.transform = "rotateX(25deg) scale(1)"; // عودة الكاميرا
-                }
-            }
-            animate();
-        }
-
-        // --- نظام اللاعبين والتشكيلات ---
-        const names = ["الحارس", "دفاع", "دفاع", "ظهير", "ظهير", "وسط", "وسط", "جناح", "جناح", "هجوم", "هجوم"];
-        function initPlayers() {
-            for(let i=0; i<11; i++) {
-                let pl = document.createElement('div');
-                pl.className = 'player';
-                pl.innerText = i+1;
-                pl.setAttribute('data-name', names[i]);
-                pl.style.left = (10 + i*7) + "%"; pl.style.top = "45%";
-                makeDraggable(pl);
-                pitch.appendChild(pl);
+    // --- المحرك السينمائي للهندسة ---
+    function runCinematic() {
+        if(points.length < 5) return alert("ارسم مساراً منحنيًا أولاً!");
+        ball.style.display = "block";
+        let i = 0;
+        function animate() {
+            if(i < points.length) {
+                const p = points[i];
+                // تأثير الكاميرا (تغيير المنظور بناءً على موقع الكرة)
+                const pitch = document.getElementById('pitch');
+                const tilt = 20 + (p.y / canvas.height * 10);
+                pitch.style.transform = `rotateX(${tilt}deg) scale(${1 + (i/points.length)*0.05})`;
+                
+                // تأثير الارتفاع (نطة في منتصف المسار)
+                const height = Math.sin((i/points.length) * Math.PI) * 50;
+                ball.style.left = (p.x - 11) + "px";
+                ball.style.top = (p.y - 11 - height) + "px";
+                ball.style.transform = `scale(${1 + height/100})`;
+                
+                i++; requestAnimationFrame(animate);
+            } else {
+                document.getElementById('pitch').style.transform = "rotateX(20deg) scale(1)";
             }
         }
+        animate();
+    }
 
-        function makeDraggable(el) {
-            let move = false;
-            el.onmousedown = el.ontouchstart = () => move = true;
-            window.onmousemove = window.ontouchmove = (e) => {
-                if(!move) return;
-                let r = pitch.getBoundingClientRect();
-                let x = (e.clientX || e.touches[0].clientX) - r.left;
-                let y = (e.clientY || e.touches[0].clientY) - r.top;
-                el.style.left = (x - 19) + "px"; el.style.top = (y - 19) + "px";
-            };
-            window.onmouseup = window.ontouchend = () => move = false;
+    // --- إدارة الأبطال والتشكيلات ---
+    const names = ["حارس", "دفاع", "دفاع", "ظهير", "ظهير", "وسط", "وسط", "جناح", "جناح", "هجوم", "هجوم"];
+    function initPlayers() {
+        layer.innerHTML = "";
+        for(let i=1; i<=11; i++) {
+            const div = document.createElement('div');
+            div.className = 'player';
+            div.innerHTML = `<div class="p-label">${names[i-1]}</div><div class="p-circle">${i}</div>`;
+            makeDraggable(div);
+            layer.appendChild(div);
         }
+    }
 
-        function clearDraw() { ctx.clearRect(0,0,canvas.width, canvas.height); path = null; }
-        function toggleBall() { ball.style.display = (ball.style.display === 'block' ? 'none' : 'block'); }
-    </script>
+    function applyFormation(type) {
+        const players = document.querySelectorAll('.player');
+        const pos = [
+            {t:5, l:45}, {t:25, l:35}, {t:25, l:55}, {t:30, l:15}, {t:30, l:75},
+            {t:55, l:40}, {t:55, l:50}, {t:60, l:10}, {t:60, l:80}, {t:85, l:35}, {t:85, l:55}
+        ];
+        players.forEach((p, i) => {
+            p.style.top = pos[i].t + "%"; p.style.left = pos[i].l + "%";
+        });
+    }
+
+    function makeDraggable(el) {
+        let drag = false;
+        el.onmousedown = el.ontouchstart = () => drag = true;
+        window.onmousemove = window.ontouchmove = (e) => {
+            if(!drag) return;
+            const r = canvas.getBoundingClientRect();
+            const x = (e.clientX || (e.touches ? e.touches[0].clientX : 0)) - r.left;
+            const y = (e.clientY || (e.touches ? e.touches[0].clientY : 0)) - r.top;
+            el.style.left = (x - 17) + "px"; el.style.top = (y - 30) + "px";
+        };
+        window.onmouseup = window.ontouchend = () => drag = false;
+    }
+
+    function toggleBall() { ball.style.display = ball.style.display === "none" ? "block" : "none"; ball.style.top="50%"; ball.style.left="50%"; }
+    function clearAll() { ctx.clearRect(0,0,canvas.width, canvas.height); points=[]; ball.style.display="none"; }
+</script>
 </body>
 </html>
