@@ -3,102 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GFA SOVEREIGN - الميدان الملكي 🏟️</title>
+    <title>GFA SOVEREIGN - الميدان الملكي v3 🏟️</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --pitch-green: #2e7d32; }
-        body { margin: 0; font-family: 'Cairo', sans-serif; background: #1a1a1a; color: white; }
+        :root { --gold: #d4af37; --pitch-green: #2e7d32; --line-white: rgba(255,255,255,0.8); }
+        body { margin: 0; font-family: 'Cairo', sans-serif; background: #1a1a1a; color: white; overflow-x: hidden; }
         .hidden { display: none !important; }
 
-        /* 🏟️ الميدان الخرافي (نجيل + خطوط + شبك) */
+        /* 🏟️ الميدان الخرافي (الرجيم + الخطوط + الشبك) */
         #pitch { 
-            width: 95%; max-width: 800px; height: 500px; 
+            width: 92%; max-width: 750px; height: 520px; /* تم تعديل الأبعاد (الرجيم) */
             background: var(--pitch-green); 
-            border: 5px solid white; border-radius: 5px; 
+            border: 4px solid white; border-radius: 5px; 
             margin: 20px auto; position: relative; overflow: hidden;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            box-shadow: 0 0 40px rgba(0,0,0,0.6);
+            
             /* رسم النجيل المخطط والخطوط البيضاء */
             background-image: 
-                repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0,0,0,0.05) 50px, rgba(0,0,0,0.05) 100px),
-                linear-gradient(to bottom, transparent 49%, white 49.5%, white 50.5%, transparent 51%), /* خط المنتصف */
-                radial-gradient(circle, white 2px, transparent 2px); /* نقطة السنتر */
+                repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,0,0,0.03) 40px, rgba(0,0,0,0.03) 80px),
+                linear-gradient(to bottom, transparent 49.5%, var(--line-white) 50%, var(--line-white) 50.5%, transparent 51%);
         }
 
-        /* 🥅 منطقة الجزاء والشبك (المرمى) */
-        .penalty-area {
-            position: absolute; width: 40%; height: 20%;
-            border: 3px solid white; left: 30%;
+        /* 🚩 رسم الكورنر برمجياً (الزوايا الأربع) */
+        #pitch::before {
+            content: ''; position: absolute; inset: 0;
+            background-image: 
+                radial-gradient(circle at 0 0, transparent 15px, var(--line-white) 16px, var(--line-white) 18px, transparent 19px),
+                radial-gradient(circle at 100% 0, transparent 15px, var(--line-white) 16px, var(--line-white) 18px, transparent 19px),
+                radial-gradient(circle at 0 100%, transparent 15px, var(--line-white) 16px, var(--line-white) 18px, transparent 19px),
+                radial-gradient(circle at 100% 100%, transparent 15px, var(--line-white) 16px, var(--line-white) 18px, transparent 19px);
+            z-index: 1;
         }
-        .top-goal { top: 0; border-top: none; } /* المرمى العلوي */
-        .bottom-goal { bottom: 0; border-bottom: none; } /* المرمى السفلي */
-        
-        .goal-net {
-            position: absolute; width: 20%; height: 5%;
-            background: rgba(255,255,255,0.2); border: 2px solid white;
-            left: 40%; z-index: 1;
-        }
+
+        /* 🥅 منطقة الجزاء والشبك */
+        .penalty-area { position: absolute; width: 44%; height: 18%; border: 3px solid var(--line-white); left: 28%; z-index: 2; }
+        .top-goal { top: 0; border-top: none; }
+        .bottom-goal { bottom: 0; border-bottom: none; }
+        .goal-net { position: absolute; width: 20%; height: 4%; background: rgba(255,255,255,0.15); border: 2px solid white; left: 40%; z-index: 1; }
 
         /* ⚽ اللاعب مع الاسم فوقه */
-        .player-wrapper {
-            position: absolute; display: flex; flex-direction: column;
-            align-items: center; cursor: move; z-index: 100; touch-action: none;
-        }
-        .player-circle {
-            width: 35px; height: 35px; background: var(--gold);
-            border-radius: 50%; border: 2px solid white;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: black; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        .player-name {
-            background: rgba(0,0,0,0.7); color: white; font-size: 10px;
-            padding: 2px 6px; border-radius: 4px; margin-bottom: 2px;
-            white-space: nowrap; border: 1px solid var(--gold);
-        }
+        .player-wrapper { position: absolute; display: flex; flex-direction: column; align-items: center; cursor: move; z-index: 100; touch-action: none; transition: transform 0.2s ease; }
+        .player-wrapper:active { transform: scale(1.1); z-index: 1000; }
+        .player-circle { width: 32px; height: 32px; background: var(--gold); border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-weight: bold; color: black; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 14px; }
+        .player-name { background: rgba(0,0,0,0.75); color: white; font-size: 9px; padding: 2px 5px; border-radius: 4px; margin-bottom: 2px; white-space: nowrap; border: 1px solid var(--gold); }
 
-        .btn { background: #059669; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; }
+        .btn { background: #059669; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; font-size: 16px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; text-align: center; }
     </style>
 </head>
 <body>
 
     <div id="gate" style="position:fixed; inset:0; background:#0d3d29; z-index:9999; display:flex; justify-content:center; align-items:center;">
-        <div style="background:#fff; padding:30px; border-radius:15px; width:320px; text-align:center;">
-            <h2 style="color:#059669;">GFA SOVEREIGN</h2>
+        <div style="background:#fff; padding:30px; border-radius:15px; width:320px; text-align:center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+            <h2 style="color:#059669; margin-top: 0;">GFA SOVEREIGN</h2>
+            <p style="font-size: 12px; color: #666;">نظام إدارة النخبة الاحترافي</p>
             <input type="text" id="L_CODE" placeholder="كود الدوري">
             <input type="text" id="U_NAME" placeholder="اسمك الكامل">
-            <button class="btn" onclick="ACTIVATE()">دخول الميدان الخرافي ⚡</button>
+            <button class="btn" onclick="ACTIVATE()">دخول الميدان الملكي ⚡</button>
         </div>
     </div>
 
     <div id="arena" class="hidden">
-        <h2 style="text-align:center; color:var(--gold); margin-top:10px;">📐 غرفة التكتيك السيادية</h2>
+        <h2 style="text-align:center; color:var(--gold); margin-top:15px; margin-bottom: 5px;">📐 غرفة التكتيك السيادية</h2>
+        <p style="text-align:center; color:#ccc; font-size:12px; margin-top:0;">ادفن معرض السيارات وابدأ الهجوم!</p>
         
         <div id="pitch">
-            <div class="goal-net" style="top:0; border-bottom: 1px dashed white;"></div>
+            <div class="goal-net" style="top:0; border-bottom: 1px dashed rgba(255,255,255,0.5);"></div>
             <div class="penalty-area top-goal"></div>
             
             <div class="penalty-area bottom-goal"></div>
-            <div class="goal-net" style="bottom:0; border-top: 1px dashed white;"></div>
+            <div class="goal-net" style="bottom:0; border-top: 1px dashed rgba(255,255,255,0.5);"></div>
 
-            <div style="position:absolute; top:50%; left:50%; width:120px; height:120px; border:3px solid white; border-radius:50%; transform:translate(-50%, -50%);"></div>
+            <div style="position:absolute; top:50%; left:50%; width:110px; height:110px; border:3px solid var(--line-white); border-radius:50%; transform:translate(-50%, -50%); z-index: 2;"></div>
+            <div style="position:absolute; top:50%; left:50%; width:4px; height:4px; background:var(--line-white); border-radius:50%; transform:translate(-50%, -50%); z-index: 3;"></div>
         </div>
 
-        <div style="padding:20px;">
-            <button class="btn" onclick="loadPitch()">إعادة توزيع الأبطال 🔄</button>
+        <div style="padding: 10px 20px 20px; max-width: 750px; margin: 0 auto;">
+            <button class="btn" onclick="loadPitch()">تفكيك معرض السيارات 🔄</button>
         </div>
     </div>
 
     <script>
         function ACTIVATE() {
             const name = document.getElementById('U_NAME').value;
-            if(!name) return alert("أدخل اسمك!");
+            if(!name) return alert("أدخل اسمك يا قائد!");
             document.getElementById('gate').classList.add('hidden');
             document.getElementById('arena').classList.remove('hidden');
             loadPitch();
         }
 
-        const playerNames = ["الحارس", "دفاع 1", "دفاع 2", "ظهير", "ظهير", "وسط", "وسط", "جناح", "جناح", "هجوم 1", "هجوم 2"];
+        const playerNames = ["الحارس", "دفاع 1", "دفاع 2", "ظهير يمين", "ظهير يسار", "وسط 1", "وسط 2", "جناح يمين", "جناح يسار", "هجوم 1", "هجوم 2"];
+
+        // 🛡️ إحداثيات تشكيلة 4-4-2 (لدفن معرض السيارات)
+        const formation442 = [
+            {top: 5, left: 44.5}, // الحارس
+            {top: 22, left: 35}, {top: 22, left: 54}, // قلبي دفاع
+            {top: 25, left: 15}, {top: 25, left: 74}, // أظهره
+            {top: 48, left: 35}, {top: 48, left: 54}, // وسطي ارتكاز
+            {top: 52, left: 10}, {top: 52, left: 79}, // أجنحة
+            {top: 78, left: 35}, {top: 78, left: 54}  // هجوم
+        ];
 
         function loadPitch() {
             const pitch = document.getElementById('pitch');
@@ -122,8 +128,9 @@
                 wrapper.appendChild(nameTag);
                 wrapper.appendChild(circle);
                 
-                wrapper.style.top = (20 + (i*6)) + "%";
-                wrapper.style.left = (10 + (i*7)) + "%";
+                // تطبيق التشكيلة التكتيكية بدلاً من الصف المستقيم
+                wrapper.style.top = formation442[i].top + "%";
+                wrapper.style.left = formation442[i].left + "%";
                 
                 makeDraggable(wrapper, pitch);
                 pitch.appendChild(wrapper);
@@ -135,7 +142,10 @@
             elm.onmousedown = elm.ontouchstart = dragStart;
 
             function dragStart(e) {
-                e.preventDefault();
+                // منع التمرير في الجوال أثناء السحب
+                if (e.type === 'touchstart') {
+                    // e.preventDefault(); // تم إيقافه مؤقتاً لحل مشاكل التفاعل
+                }
                 pos3 = e.clientX || e.touches[0].clientX;
                 pos4 = e.clientY || e.touches[0].clientY;
                 document.onmouseup = document.ontouchend = closeDrag;
@@ -152,8 +162,9 @@
                 let newL = elm.offsetLeft - pos1;
                 
                 const rect = container.getBoundingClientRect();
-                if (newT >= 0 && newT <= rect.height - 50) elm.style.top = newT + "px";
-                if (newL >= 0 && newL <= rect.width - 40) elm.style.left = newL + "px";
+                // منع الخروج من حدود الملعب (مع مراعاة الاسم فوق اللاعب)
+                if (newT >= 0 && newT <= rect.height - 55) elm.style.top = newT + "px";
+                if (newL >= 0 && newL <= rect.width - 45) elm.style.left = newL + "px";
             }
 
             function closeDrag() {
