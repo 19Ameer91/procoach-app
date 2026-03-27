@@ -57,104 +57,91 @@
 </div>
 
 <script>
-    const canvas = document.getElementById('draw-layer');
-    const ctx = canvas.getContext('2d');
-    const ball = document.getElementById('ball');
-    let isDrawing = false;
-    let lastArrow = null; // تخزين آخر سهم مرسوم لتحريك الكرة عليه
-
-    window.onload = () => {
-        const p = document.getElementById('pitch');
-        canvas.width = p.clientWidth;
-        canvas.height = p.clientHeight;
-        initPlayers();
-    };
-
-    // --- نظام الرسم الهندسي ---
-    let startX, startY;
-    canvas.onmousedown = (e) => {
-        isDrawing = true;
-        const r = canvas.getBoundingClientRect();
-        startX = e.clientX - r.left;
-        startY = e.clientY - r.top;
-    };
-
-    canvas.onmouseup = (e) => {
-        if(!isDrawing) return;
-        const r = canvas.getBoundingClientRect();
-        const endX = e.clientX - r.left;
-        const endY = e.clientY - r.top;
-        drawArrow(startX, startY, endX, endY);
-        lastArrow = { x1: startX, y1: startY, x2: endX, y2: endY };
-        isDrawing = false;
-    };
-
-    function drawArrow(x1, y1, x2, y2) {
-        ctx.clearRect(0,0,canvas.width, canvas.height); // مسح لرسم سهم واحد جديد
-        ctx.beginPath();
-        ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
-        ctx.strokeStyle = "yellow"; ctx.lineWidth = 4; ctx.stroke();
-        // رأس السهم
-        const angle = Math.atan2(y2 - y1, x2 - x1);
-        ctx.lineTo(x2 - 15 * Math.cos(angle - Math.PI / 6), y2 - 15 * Math.sin(angle - Math.PI / 6));
-        ctx.moveTo(x2, y2);
-        ctx.lineTo(x2 - 15 * Math.cos(angle + Math.PI / 6), y2 - 15 * Math.sin(angle + Math.PI / 6));
-        ctx.stroke();
+    // --- 1. إصلاح حركة الجميع (الـ 11 لاعباً) ---
+    function initPlayers() {
+        const pitch = document.getElementById('pitch');
+        pitch.querySelectorAll('.player').forEach(p => p.remove()); // تنظيف
+        
+        for(let i=1; i<=11; i++) {
+            const p = document.createElement('div');
+            p.className = 'player';
+            p.innerText = i;
+            // توزيع ذكي مبدئي
+            p.style.top = (20 + (i*5)) + "%";
+            p.style.left = (10 + (i*7)) + "%";
+            
+            // تفعيل السحب (كل لاعب له ذاكرة حركة مستقلة)
+            makeDraggable(p, pitch);
+            pitch.appendChild(p);
+        }
     }
 
-    // --- المحاكي التفاعلي (الكرة تتحرك خلف السهم) ---
+    // --- 2. محرك الكرة الساقطة (Arc Motion) ---
     function simulateAction() {
-        if(!lastArrow) return alert("ارسم سهم تمرير أولاً يا قائد!");
+        if(!lastArrow) return alert("ارسم مسار الهجمة أولاً!");
         
         let progress = 0;
-        const speed = 0.02; // سرعة الكرة
+        const speed = 0.015; 
+        const ball = document.getElementById('ball');
 
         function animate() {
             if (progress <= 1) {
-                const currentX = lastArrow.x1 + (lastArrow.x2 - lastArrow.x1) * progress;
-                const currentY = lastArrow.y1 + (lastArrow.y2 - lastArrow.y1) * progress;
+                // إحداثيات مستقيمة
+                const x = lastArrow.x1 + (lastArrow.x2 - lastArrow.x1) * progress;
+                const y = lastArrow.y1 + (lastArrow.y2 - lastArrow.y1) * progress;
                 
-                ball.style.left = (currentX - 10) + "px";
-                ball.style.top = (currentY - 10) + "px";
+                // تأثير الكرة الساقطة (الارتفاع البرمجي)
+                // نستخدم معادلة القطع المكافئ: h = 4 * height * progress * (1 - progress)
+                const jumpHeight = 60; // قوة الارتفاع
+                const offset = 4 * jumpHeight * progress * (1 - progress);
                 
+                ball.style.left = (x - 10) + "px";
+                ball.style.top = (y - 10 - offset) + "px"; // ترتفع ثم تنخفض
+                
+                // تغيير حجم الكرة ليوحي بالارتفاع (تأثير بصري)
+                const scale = 1 + (offset / 100);
+                ball.style.transform = `scale(${scale})`;
+
                 progress += speed;
                 requestAnimationFrame(animate);
             } else {
-                alert("⚽ تم تنفيذ التمريرة بنجاح!");
+                ball.style.transform = `scale(1)`;
+                alert("⚽ تم تنفيذ الكرة الساقطة بنجاح!");
             }
         }
         animate();
     }
 
-    function clearAll() {
-        ctx.clearRect(0,0,canvas.width, canvas.height);
-        lastArrow = null;
-        ball.style.top = "50%"; ball.style.left = "50%";
-    }
-
-    function initPlayers() {
-        const p = document.getElementById('pitch');
-        for(let i=1; i<=11; i++) {
-            const d = document.createElement('div');
-            d.className = 'player'; d.innerText = i;
-            d.style.top = (Math.random() * 80 + 5) + "%";
-            d.style.left = (Math.random() * 80 + 5) + "%";
-            makeDraggable(d, p);
-            p.appendChild(d);
-        }
-    }
-
+    // --- 3. تصحيح وظيفة السحب الموحدة ---
     function makeDraggable(el, container) {
-        let drag = false;
-        el.onmousedown = el.ontouchstart = () => drag = true;
-        window.onmousemove = window.ontouchmove = (e) => {
-            if(!drag) return;
+        let isMoving = false;
+        
+        const start = (e) => { 
+            isMoving = true; 
+            el.style.zIndex = 1000; 
+            e.stopPropagation(); // منع تداخل السحب مع الرسم
+        };
+        
+        const move = (e) => {
+            if (!isMoving) return;
             const r = container.getBoundingClientRect();
             const cx = (e.clientX || e.touches[0].clientX) - r.left;
             const cy = (e.clientY || e.touches[0].clientY) - r.top;
-            el.style.left = (cx - 16) + "px"; el.style.top = (cy - 16) + "px";
+            
+            // الحفاظ على اللاعب داخل الميدان
+            if(cx > 0 && cx < r.width && cy > 0 && cy < r.height) {
+                el.style.left = (cx - 16) + "px";
+                el.style.top = (cy - 16) + "px";
+            }
         };
-        window.onmouseup = window.ontouchend = () => drag = false;
+
+        const stop = () => { isMoving = false; };
+
+        el.onmousedown = el.ontouchstart = start;
+        window.addEventListener('mousemove', move);
+        window.addEventListener('touchmove', move, {passive: false});
+        window.addEventListener('mouseup', stop);
+        window.addEventListener('touchend', stop);
     }
 </script>
 </body>
