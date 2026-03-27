@@ -3,40 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GFA SOVEREIGN - PRO COACH</title>
+    <title>GFA SOVEREIGN - الميدان الاحترافي</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --green: #059669; --dark: #0d3d29; }
         body { margin: 0; font-family: 'Cairo', sans-serif; background: #f0f2f5; direction: rtl; }
+        .hidden { display: none !important; }
         
-        /* شاشة الدخول المضمونة */
-        #gate { position: fixed; inset: 0; background: var(--dark); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .box { background: white; padding: 30px; border-radius: 15px; width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        /* الواجهة الرئيسية */
-        .header { background: linear-gradient(135deg, #1e40af, #059669); color: white; padding: 15px; text-align: center; }
-        .nav { background: #1f2937; display: flex; justify-content: space-around; }
-        .nav-btn { color: #9ca3af; padding: 15px; cursor: pointer; border: none; background: none; font-weight: bold; }
-        .nav-btn.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
+        /* 🏟️ تحويل المنصة لملعب كرة قدم حقيقي (رسم برمجى) */
+        #pitch { 
+            width: 100%; height: 450px; background: #2e7d32; 
+            border: 4px solid white; border-radius: 10px; 
+            position: relative; overflow: hidden; margin: 15px auto;
+            /* رسم خطوط الملعب */
+            background-image: 
+                linear-gradient(to bottom, transparent 49%, white 49%, white 51%, transparent 51%),
+                radial-gradient(circle, transparent 19%, white 19%, white 21%, transparent 21%);
+            background-size: 100% 100%, 150px 150px;
+            background-position: center; background-repeat: no-repeat;
+        }
+
+        /* ⚽ تصميم اللاعبين */
+        .player { 
+            width: 35px; height: 35px; background: var(--gold); 
+            color: black; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; 
+            position: absolute; cursor: move; border: 2px solid white; 
+            font-weight: bold; font-size: 14px; z-index: 100;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            touch-action: none; /* لمنع اهتزاز الصفحة في الجوال */
+        }
 
         .card { background: white; border-radius: 12px; padding: 20px; margin: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #pitch { width: 100%; height: 400px; background: #2e7d32; border: 3px solid white; position: relative; border-radius: 10px; margin-top: 10px; overflow: hidden; }
-        .player { width: 30px; height: 30px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; cursor: move; border: 2px solid white; font-weight: bold; font-size: 11px; color: black; z-index: 10; }
-
-        .btn { background: var(--green); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; }
-        .hidden { display: none !important; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; }
+        .header { background: linear-gradient(135deg, #1e40af, #059669); color: white; padding: 15px; text-align: center; }
+        .btn { background: var(--green); color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-    <div id="gate">
-        <div class="box">
-            <h2 style="color: var(--green);">GFA SOVEREIGN</h2>
+    <div id="gate" style="position:fixed; inset:0; background:var(--dark); z-index:9999; display:flex; justify-content:center; align-items:center;">
+        <div style="background:white; padding:30px; border-radius:15px; width:320px; text-align:center;">
+            <h2 style="color:var(--green);">GFA SOVEREIGN</h2>
             <input type="text" id="L_CODE" placeholder="كود الدوري">
             <input type="text" id="U_NAME" placeholder="اسمك الكامل">
             <button class="btn" onclick="ACTIVATE()">دخول الميدان ⚡</button>
@@ -45,125 +55,94 @@
 
     <div id="arena" class="hidden">
         <div class="header">
-            <h2 id="title">PRO COACH</h2>
-            <p>أهلاً بك يا <span id="userDisp"></span></p>
+            <h2 id="title">دوري: </h2>
+            <p>القائد: <span id="userDisp"></span></p>
         </div>
-        <nav class="nav">
-            <button class="nav-btn active" onclick="tab('t1')">👥 الفريق</button>
-            <button class="nav-btn" onclick="tab('t2')">📐 التكتيك</button>
-            <button class="nav-btn" onclick="tab('t3')">⚙️ الإدارة</button>
-            <button class="nav-btn" onclick="location.reload()" style="color:red">🚪 خروج</button>
-        </nav>
-
-        <div id="t1" class="page">
-            <div class="card">
-                <h3>إضافة لاعب ➕</h3>
-                <input type="text" id="pName" placeholder="الاسم">
-                <input type="number" id="pNum" placeholder="الرقم">
-                <button class="btn" onclick="saveP()">حفظ ✅</button>
-            </div>
-            <div class="card">
-                <table>
-                    <thead><tr><th>الاسم</th><th>الرقم</th><th>حذف</th></tr></thead>
-                    <tbody id="pList"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="t2" class="page hidden">
-            <div class="card" style="background:#222;">
-                <h3 style="color:white; text-align:center;">غرفة التكتيك 📐</h3>
-                <div id="pitch"></div>
-            </div>
-        </div>
-
-        <div id="t3" class="page hidden">
-            <div class="card">
-                <h3>الكلمة الحاسمة 🛡️</h3>
-                <input type="number" id="target" value="12">
-                <button class="btn" onclick="alert('🛡️ تم التثبيت!')">تثبيت العدد</button>
-            </div>
+        
+        <div class="card" style="background:#222;">
+            <h3 style="color:white; text-align:center;">غرفة التكتيك 📐</h3>
+            <div id="pitch"></div>
+            <button class="btn" style="background:var(--gold); color:black;" onclick="loadPitch()">إعادة رص الصفوف 🔄</button>
         </div>
     </div>
 
     <script>
-        // المحرك الأساسي
         function ACTIVATE() {
             const code = document.getElementById('L_CODE').value.toUpperCase();
             const name = document.getElementById('U_NAME').value;
             if(!code || !name) return alert("أكمل البيانات!");
 
-            // الاقتحام الفوري
             document.getElementById('gate').classList.add('hidden');
             document.getElementById('arena').classList.remove('hidden');
             document.getElementById('userDisp').innerText = name;
             document.getElementById('title').innerText = "دوري: " + code;
             
-            initFB(code);
+            loadPitch();
         }
 
-        function tab(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            if(id === 't2') loadPitch();
-        }
-
-        // ربط السحاب
-        function initFB(c) {
-            const conf = { databaseURL: "https://procoach-8029d-default-rtdb.europe-west1.firebasedatabase.app" };
-            if(!firebase.apps.length) firebase.initializeApp(conf);
-            firebase.database().ref('leagues/'+c+'/players').on('value', (s) => {
-                const b = document.getElementById('pList'); b.innerHTML = "";
-                s.forEach(child => {
-                    b.innerHTML += `<tr><td>${child.val().name}</td><td>${child.val().num}</td><td onclick="delP('${child.key}')" style="color:red;cursor:pointer">❌</td></tr>`;
-                });
-            });
-        }
-
-        function saveP() {
-            const n = document.getElementById('pName').value;
-            const num = document.getElementById('pNum').value;
-            const c = document.getElementById('L_CODE').value.toUpperCase();
-            if(n) firebase.database().ref('leagues/'+c+'/players').push({name:n, num:num});
-            document.getElementById('pName').value = ""; document.getElementById('pNum').value = "";
-        }
-
-        function delP(id) { 
-            const c = document.getElementById('L_CODE').value.toUpperCase();
-            firebase.database().ref('leagues/'+c+'/players/'+id).remove(); 
-        }
-
-       function loadPitch() {
-        const pitch = document.getElementById('pitch');
-        pitch.innerHTML = ""; 
-        for(let i=1; i<=11; i++) {
-            const p = document.createElement('div');
-            p.className = 'player';
-            p.innerText = i;
-            p.style.top = "50%"; 
-            p.style.left = (i * 8) + "%";
+        function loadPitch() {
+            const pitch = document.getElementById('pitch');
+            pitch.innerHTML = ""; 
             
-            // --- محرك السحب والإفلات للقائد علي ---
-            let dragging = false;
-            p.onmousedown = p.ontouchstart = (e) => { 
-                dragging = true; 
-                p.style.zIndex = 1000;
-            };
-
-            window.onmousemove = window.ontouchmove = (e) => {
-                if(dragging) {
-                    const r = pitch.getBoundingClientRect();
-                    const cx = e.clientX || e.touches[0].clientX;
-                    const cy = e.clientY || e.touches[0].clientY;
-                    p.style.left = (cx - r.left - 16) + "px";
-                    p.style.top = (cy - r.top - 16) + "px";
-                }
-            };
-
-            window.onmouseup = window.ontouchend = () => { dragging = false; };
-            pitch.appendChild(p);
+            for(let i=1; i<=11; i++) {
+                const p = document.createElement('div');
+                p.className = 'player';
+                p.innerText = i;
+                
+                // توزيع اللاعبين بشكل أولي
+                p.style.top = "45%";
+                p.style.left = (i * 8) + "%";
+                
+                // تفعيل السحب لكل لاعب بشكل مستقل
+                makeElementDraggable(p, pitch);
+                
+                pitch.appendChild(p);
+            }
         }
-    }
+
+        // محرك السحب الشامل لجميع اللاعبين
+        function makeElementDraggable(elm, container) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+            elm.onmousedown = dragMouseDown;
+            elm.ontouchstart = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e.preventDefault();
+                pos3 = e.clientX || e.touches[0].clientX;
+                pos4 = e.clientY || e.touches[0].clientY;
+                document.onmouseup = closeDragElement;
+                document.ontouchend = closeDragElement;
+                document.onmousemove = elementDrag;
+                document.ontouchmove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                let clientX = e.clientX || e.touches[0].clientX;
+                let clientY = e.clientY || e.touches[0].clientY;
+                
+                pos1 = pos3 - clientX;
+                pos2 = pos4 - clientY;
+                pos3 = clientX;
+                pos4 = clientY;
+
+                let newTop = elm.offsetTop - pos2;
+                let newLeft = elm.offsetLeft - pos1;
+
+                // قيد الحركة داخل حدود الملعب
+                const rect = container.getBoundingClientRect();
+                if (newTop >= 0 && newTop <= rect.height - 35) elm.style.top = newTop + "px";
+                if (newLeft >= 0 && newLeft <= rect.width - 35) elm.style.left = newLeft + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                document.ontouchend = null;
+                document.ontouchmove = null;
+            }
+        }
     </script>
 </body>
 </html>
