@@ -133,14 +133,37 @@
             firebase.database().ref('leagues/'+c+'/players/'+id).remove(); 
         }
 
-        function loadPitch() {
-            const pitch = document.getElementById('pitch'); pitch.innerHTML = "";
-            for(let i=1; i<=11; i++) {
-                const p = document.createElement('div'); p.className = 'player'; p.innerText = i;
-                p.style.top = "50%"; p.style.left = (i*8)+"%";
-                pitch.appendChild(p);
-            }
+       function loadPitch() {
+        const pitch = document.getElementById('pitch');
+        pitch.innerHTML = ""; 
+        for(let i=1; i<=11; i++) {
+            const p = document.createElement('div');
+            p.className = 'player';
+            p.innerText = i;
+            p.style.top = "50%"; 
+            p.style.left = (i * 8) + "%";
+            
+            // --- محرك السحب والإفلات للقائد علي ---
+            let dragging = false;
+            p.onmousedown = p.ontouchstart = (e) => { 
+                dragging = true; 
+                p.style.zIndex = 1000;
+            };
+
+            window.onmousemove = window.ontouchmove = (e) => {
+                if(dragging) {
+                    const r = pitch.getBoundingClientRect();
+                    const cx = e.clientX || e.touches[0].clientX;
+                    const cy = e.clientY || e.touches[0].clientY;
+                    p.style.left = (cx - r.left - 16) + "px";
+                    p.style.top = (cy - r.top - 16) + "px";
+                }
+            };
+
+            window.onmouseup = window.ontouchend = () => { dragging = false; };
+            pitch.appendChild(p);
         }
+    }
     </script>
 </body>
 </html>
