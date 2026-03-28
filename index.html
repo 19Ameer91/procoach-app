@@ -2,121 +2,176 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GFA TITAN v15 | وزارة الرياضة - عُمان</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>GFA TITAN v15 PRO | وزارة الرياضة - عُمان</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #d4af37; --gold-light: #f5d060; --dark-pitch: #1b5e20;
-            --bg-deep: #08080f; --panel-dark: #0c0c18; --wood: #5d4037;
+            --gold: #d4af37; --gold2: #f5d060;
+            --pitch: #1b5e20; --dark: #08080f; --panel: #0c0c18;
+            --wood: #5d4037;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--dark); color: white; font-family: 'Cairo', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+
+        /* 🏟️ الاستاد الليلي والمنظور العميق */
+        #app { display: flex; flex-direction: column; height: 100vh; }
+        #arena { flex: 1; position: relative; perspective: 1100px; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #1a1a2e 0%, #000 100%); overflow: hidden; }
+        
+        /* الإطار الخشبي v15 */
+        #wood-frame { padding: 12px; background: var(--wood); border: 3px solid var(--gold); border-radius: 10px; transform: rotateX(28deg) translateY(-20px); box-shadow: 0 40px 80px rgba(0,0,0,0.9); transition: 0.5s; }
+
+        /* الملعب بـ 10 شرائط محاكة */
+        #pitch { 
+            width: 800px; height: 520px; background: var(--pitch); 
+            background-image: repeating-linear-gradient(90deg, rgba(0,0,0,0.1) 0, rgba(0,0,0,0.1) 80px, transparent 80px, transparent 160px);
+            border: 2px solid rgba(255,255,255,0.8); position: relative; overflow: hidden;
         }
 
-        body { margin: 0; background: var(--bg-deep); color: white; font-family: 'Cairo', sans-serif; overflow: hidden; height: 100vh; }
-
-        /* 🏟️ الميدان الدرامي (تحاكي الاستاد الليلي) */
-        #stadium-vignette {
-            position: fixed; inset: 0;
-            background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.8) 100%);
-            pointer-events: none; z-index: 10;
-        }
-
-        #main-arena {
-            height: 100vh; display: flex; justify-content: center; align-items: center;
-            perspective: 1100px; /* منظور 3D المطلوب */
-        }
-
-        /* الإطار الخشبي الملكي v15 */
-        #wood-frame {
-            padding: 15px; background: var(--wood);
-            border: 4px solid var(--gold); border-radius: 12px;
-            box-shadow: 0 50px 100px rgba(0,0,0,0.9), 0 0 30px rgba(212,175,55,0.2);
-            transform: rotateX(28deg); /* المنظور المطلوب */
-            transition: 0.5s;
-        }
-
-        /* خطوط العشب المحاكة (10 شرائط) */
-        #pitch {
-            width: 750px; height: 500px; background: var(--dark-pitch);
-            background-image: repeating-linear-gradient(90deg, 
-                rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 75px, 
-                transparent 75px, transparent 150px); /* 10 شرائط عرضية محاكة */
-            border: 2px solid rgba(255,255,255,0.8); position: relative;
-        }
-
-        /* 💡 أضواء الاستاد (4 نقاط ضوء) */
-        .floodlight {
-            position: absolute; width: 60px; height: 60px;
-            background: radial-gradient(circle, white 0%, transparent 70%);
-            opacity: 0.4; filter: blur(10px); z-index: 50;
-        }
-
-        /* 🛡️ لوحات التحكم الجانبية (الواجهة الاحترافية) */
-        .side-panel {
-            position: absolute; top: 0; bottom: 0; width: 220px;
-            background: var(--panel-dark); border: 1px solid rgba(212,175,55,0.2);
-            backdrop-filter: blur(10px); z-index: 100; padding: 20px;
-            display: flex; flex-direction: column; gap: 15px;
-        }
-
+        /* 🛡️ الواجهة الاحترافية (Dark UI) */
+        .side-panel { position: absolute; top: 0; bottom: 0; width: 220px; background: var(--panel); border: 1px solid rgba(212,175,55,0.2); backdrop-filter: blur(10px); z-index: 1000; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .left-p { left: 0; border-right: 2px solid var(--gold); }
         .right-p { right: 0; border-left: 2px solid var(--gold); }
 
-        /* ⚽ اللاعب والقميص SVG */
-        .player-unit {
-            position: absolute; cursor: move; z-index: 200;
-            filter: drop-shadow(0 8px 5px rgba(0,0,0,0.6)); /* ظل عميق */
-        }
+        /* ⚽ اللاعبين (SVG واقعي) */
+        .player { position: absolute; width: 42px; height: 42px; cursor: move; z-index: 100; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0 6px 4px rgba(0,0,0,0.5)); }
+        .player .icon { width: 34px; height: 34px; background: var(--gold); border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; color: black; font-size: 14px; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
+        .player .name { background: rgba(0,0,0,0.85); color: var(--gold); font-size: 9px; padding: 1px 6px; border-radius: 4px; margin-bottom: 2px; white-space: nowrap; border: 1px solid var(--gold); }
 
-        /* ✏️ الرسم بتوهج ذهبي 3 طبقات */
-        .drawing-layer {
-            position: absolute; inset: 0; pointer-events: none; z-index: 150;
-        }
+        /* 🏀 الكرة */
+        #ball { position: absolute; width: 22px; height: 22px; background: white; border-radius: 50%; border: 2px solid black; z-index: 150; box-shadow: 0 10px 15px rgba(0,0,0,0.5); display: none; }
 
-        .formation-btn {
-            background: rgba(212,175,55,0.1); border: 1px solid var(--gold);
-            color: var(--gold); padding: 8px; border-radius: 5px; cursor: pointer;
-            font-size: 11px; transition: 0.3s;
-        }
-        .formation-btn:hover { background: var(--gold); color: black; }
+        /* الأزرار والتشكيلات الـ 8 */
+        .f-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+        .f-btn { background: rgba(212,175,55,0.05); border: 1px solid rgba(212,175,55,0.3); color: var(--gold); padding: 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; font-family: 'Cairo'; }
+        .f-btn:hover { background: var(--gold); color: black; }
+
+        /* شريط التحكم السفلي */
+        footer { height: 70px; background: #05050a; border-top: 1px solid var(--gold); display: flex; justify-content: space-around; align-items: center; z-index: 2000; }
+        .tool-btn { background: none; border: none; color: #666; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .tool-btn.active { color: var(--gold); }
+        .tool-btn i { font-size: 18px; } .tool-btn span { font-size: 10px; }
+
+        canvas { position: absolute; inset: 0; z-index: 50; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div id="stadium-vignette"></div>
-
-    <div class="side-panel left-p">
-        <h3 style="color:var(--gold); font-size:14px;">🛡️ الفريق المضيف</h3>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
-            <button class="formation-btn">4-4-2</button>
-            <button class="formation-btn">4-3-3</button>
-            <button class="formation-btn">3-5-2</button>
-            <button class="formation-btn">4-2-3-1</button>
-            <button class="formation-btn">4-5-1</button>
-            <button class="formation-btn">5-3-2</button>
-            <button class="formation-btn">3-4-3</button>
-            <button class="formation-btn">4-1-4-1</button>
+<div id="app">
+    <aside class="side-panel left-p">
+        <h4 style="color:var(--gold); border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:5px;">🛡️ المضيف (8 تشكيلات)</h4>
+        <div class="f-grid" id="h-forms">
+            <button class="f-btn" onclick="applyF('442','home')">4-4-2</button>
+            <button class="f-btn" onclick="applyF('433','home')">4-3-3</button>
+            <button class="f-btn" onclick="applyF('352','home')">3-5-2</button>
+            <button class="f-btn" onclick="applyF('4231','home')">4-2-3-1</button>
+            <button class="f-btn" onclick="applyF('451','home')">4-5-1</button>
+            <button class="f-btn" onclick="applyF('532','home')">5-3-2</button>
+            <button class="f-btn" onclick="applyF('343','home')">3-4-3</button>
+            <button class="f-btn" onclick="applyF('4141','home')">4-1-4-1</button>
         </div>
-        <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
-        <div style="font-size:10px; color:#aaa;">نقش وزارة الرياضة - عُمان 🇴🇲</div>
-    </div>
+        <div id="h-list" style="margin-top:10px; font-size:10px; color:#888; height: 150px; overflow-y: auto;"></div>
+    </aside>
 
-    <div id="main-arena">
+    <main id="arena">
         <div id="wood-frame">
             <div id="pitch">
-                <div class="floodlight" style="top:-30px; left:-30px;"></div>
-                <div class="floodlight" style="top:-30px; right:-30px;"></div>
-                <div class="floodlight" style="bottom:-30px; left:-30px;"></div>
-                <div class="floodlight" style="bottom:-30px; right:-30px;"></div>
-                
-                <div style="position:absolute; top:50%; left:50%; width:120px; height:120px; border:2px solid white; border-radius:50%; transform:translate(-50%, -50%);"></div>
-                <div style="position:absolute; top:50%; left:0; right:0; height:2px; background:white;"></div>
+                <canvas id="drawCanvas"></canvas>
+                <div id="ball"></div>
+                <div style="position:absolute; top:0; left:30%; width:40%; height:18%; border:2px solid white; border-top:none;"></div>
+                <div style="position:absolute; bottom:0; left:30%; width:40%; height:18%; border:2px solid white; border-bottom:none;"></div>
+                <div style="position:absolute; top:50%; left:50%; width:110px; height:110px; border:2px solid white; border-radius:50%; transform:translate(-50%, -50%);"></div>
+                <div id="players-layer"></div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <div class="side-panel right-p">
-        <h3 style="color:var(--gold); font-size:14px;">🐆 الفريق الضيف</h3>
+    <aside class="side-panel right-p">
+        <h4 style="color:var(--gold); border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:5px;">🐆 الضيف (8 تشكيلات)</h4>
+        <div class="f-grid" id="a-forms">
+            <button class="f-btn" onclick="applyF('442','away')">4-4-2</button>
+            <button class="f-btn" onclick="applyF('433','away')">4-3-3</button>
+            <button class="f-btn" onclick="applyF('352','away')">3-5-2</button>
+            <button class="f-btn" onclick="applyF('4231','away')">4-2-3-1</button>
+            <button class="f-btn" onclick="applyF('451','away')">4-5-1</button>
+            <button class="f-btn" onclick="applyF('532','away')">5-3-2</button>
+            <button class="f-btn" onclick="applyF('343','away')">3-4-3</button>
+            <button class="f-btn" onclick="applyF('4141','away')">4-1-4-1</button>
         </div>
+    </aside>
 
+    <footer>
+        <button class="tool-btn active">🏟️<span>الميدان</span></button>
+        <button class="tool-btn" onclick="toggleBall()">⚽<span>الكرة</span></button>
+        <button class="tool-btn" onclick="clearDraw()">🗑️<span>مسح</span></button>
+        <button class="tool-btn" style="color:#059669" onclick="playAnim()">▶️<span>تشغيل</span></button>
+        <button class="tool-btn" onclick="doFS()">⛶<span>شاشة كاملة</span></button>
+    </footer>
+</div>
+
+<script>
+    const layer = document.getElementById('players-layer');
+    const ball = document.getElementById('ball');
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const FORM = {
+        '442': [[5,45],[22,35],[22,55],[25,15],[25,75],[50,35],[50,55],[55,10],[55,80],[85,40],[85,60]],
+        '433': [[5,45],[22,35],[22,55],[25,15],[25,75],[45,45],[55,25],[55,65],[85,45],[80,20],[80,70]],
+        '352': [[5,45],[20,25],[20,45],[20,65],[45,15],[45,75],[50,35],[50,55],[50,45],[80,35],[80,55]],
+        '4231': [[5,45],[22,30],[22,60],[25,10],[25,80],[45,35],[45,55],[65,15],[65,75],[65,45],[85,45]],
+        '451': [[5,45],[22,35],[22,55],[25,15],[25,75],[50,15],[50,35],[50,55],[50,75],[50,45],[85,45]],
+        '532': [[5,45],[20,20],[20,40],[20,60],[25,10],[25,80],[50,30],[50,45],[50,60],[80,35],[80,55]],
+        '343': [[5,45],[20,25],[20,45],[20,65],[50,15],[50,75],[55,35],[55,55],[80,20],[80,45],[80,70]],
+        '4141': [[5,45],[22,35],[22,55],[25,15],[25,75],[40,45],[60,15],[60,35],[60,55],[60,75],[85,45]]
+    };
+
+    function init() {
+        layer.innerHTML = "";
+        canvas.width = 800; canvas.height = 520;
+        for(let i=1; i<=11; i++) createP(i, 'home');
+        for(let i=1; i<=11; i++) createP(i, 'away');
+        applyF('442','home'); applyF('433','away');
+    }
+
+    function createP(num, team) {
+        const p = document.createElement('div');
+        p.className = 'player ' + team;
+        p.id = team + '-' + num;
+        p.innerHTML = `<span class="name">${team==='home'?'مضيف':'ضيف'} ${num}</span><div class="icon" style="background:${team==='home'?'#d4af37':'#c0392b'}">${num}</div>`;
+        makeDraggable(p);
+        layer.appendChild(p);
+    }
+
+    function applyF(type, team) {
+        const coords = FORM[type];
+        for(let i=1; i<=11; i++) {
+            const p = document.getElementById(team + '-' + i);
+            let y = coords[i-1][0], x = coords[i-1][1];
+            if(team === 'away') y = 100 - y;
+            p.style.top = y + '%'; p.style.left = x + '%';
+        }
+    }
+
+    function makeDraggable(el) {
+        let dragging = false;
+        el.onmousedown = el.ontouchstart = (e) => { dragging = true; e.stopPropagation(); };
+        window.onmousemove = window.ontouchmove = (e) => {
+            if(!dragging) return;
+            const r = document.getElementById('pitch').getBoundingClientRect();
+            const t = e.touches ? e.touches[0] : e;
+            let x = (t.clientX - r.left) / r.width * 100;
+            let y = (t.clientY - r.top) / r.height * 100;
+            el.style.left = x + '%'; el.style.top = y + '%';
+        };
+        window.onmouseup = window.ontouchend = () => dragging = false;
+    }
+
+    function toggleBall() { ball.style.display = ball.style.display === 'block' ? 'none' : 'block'; ball.style.top = '50%'; ball.style.left = '50%'; }
+    function clearDraw() { ctx.clearRect(0,0,800,520); }
+    function doFS() { if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+    
+    window.onload = init;
+</script>
 </body>
 </html>
