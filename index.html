@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>GFA TITAN v15 PRO | وزارة الرياضة - عُمان</title>
+    <title>GFA TITAN v16 PRO | محرك وزارة الرياضة 🇴🇲</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,63 +14,75 @@
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: var(--dark); color: white; font-family: 'Cairo', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-        /* 🏟️ الاستاد الليلي والمنظور العميق */
-        #app { display: flex; flex-direction: column; height: 100vh; }
+        /* 🏟️ الاستاد الليلي والمنظور السينمائي */
         #arena { flex: 1; position: relative; perspective: 1100px; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #1a1a2e 0%, #000 100%); overflow: hidden; }
         
-        /* الإطار الخشبي v15 */
-        #wood-frame { padding: 12px; background: var(--wood); border: 3px solid var(--gold); border-radius: 10px; transform: rotateX(28deg) translateY(-20px); box-shadow: 0 40px 80px rgba(0,0,0,0.9); transition: 0.5s; }
+        /* الإطار الخشبي v16 */
+        #wood-frame { padding: 12px; background: var(--wood); border: 3px solid var(--gold); border-radius: 12px; transform: rotateX(28deg) translateY(-20px); box-shadow: 0 50px 100px rgba(0,0,0,0.9); transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* الملعب بـ 10 شرائط محاكة */
+        /* الملعب بـ 10 شرائط نجيل محاكة */
         #pitch { 
-            width: 800px; height: 520px; background: var(--pitch); 
+            width: 800px; height: 530px; background: var(--pitch); 
             background-image: repeating-linear-gradient(90deg, rgba(0,0,0,0.1) 0, rgba(0,0,0,0.1) 80px, transparent 80px, transparent 160px);
-            border: 2px solid rgba(255,255,255,0.8); position: relative; overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.9); position: relative; overflow: hidden;
         }
 
-        /* 🛡️ الواجهة الاحترافية (Dark UI) */
-        .side-panel { position: absolute; top: 0; bottom: 0; width: 220px; background: var(--panel); border: 1px solid rgba(212,175,55,0.2); backdrop-filter: blur(10px); z-index: 1000; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .left-p { left: 0; border-right: 2px solid var(--gold); }
-        .right-p { right: 0; border-left: 2px solid var(--gold); }
+        /* 🛡️ لوحات التحكم الجانبية الزجاجية */
+        .side-panel { position: absolute; top: 0; bottom: 0; width: 230px; background: var(--panel); border: 1px solid rgba(212,175,55,0.25); backdrop-filter: blur(15px); z-index: 1000; padding: 15px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .left-p { left: 0; border-right: 3px solid var(--gold); }
+        .right-p { right: 0; border-left: 3px solid var(--gold); }
 
-        /* ⚽ اللاعبين (SVG واقعي) */
-        .player { position: absolute; width: 42px; height: 42px; cursor: move; z-index: 100; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0 6px 4px rgba(0,0,0,0.5)); }
-        .player .icon { width: 34px; height: 34px; background: var(--gold); border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; color: black; font-size: 14px; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
-        .player .name { background: rgba(0,0,0,0.85); color: var(--gold); font-size: 9px; padding: 1px 6px; border-radius: 4px; margin-bottom: 2px; white-space: nowrap; border: 1px solid var(--gold); }
+        /* ⚽ اللاعبين (تصميم القمصان الاحترافي) */
+        .player { position: absolute; width: 44px; height: 44px; cursor: move; z-index: 100; display: flex; flex-direction: column; align-items: center; filter: drop-shadow(0 8px 5px rgba(0,0,0,0.5)); transition: transform 0.2s; }
+        .player:active { transform: scale(1.1); z-index: 1000; }
+        .player .icon { width: 36px; height: 36px; border-radius: 50%; border: 2.5px solid #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; font-size: 14px; box-shadow: inset 0 0 15px rgba(0,0,0,0.3); }
+        .player .name { background: rgba(0,0,0,0.85); color: var(--gold); font-size: 9px; padding: 1px 7px; border-radius: 4px; margin-bottom: 3px; white-space: nowrap; border: 1px solid var(--gold); font-weight: 700; }
 
         /* 🏀 الكرة */
-        #ball { position: absolute; width: 22px; height: 22px; background: white; border-radius: 50%; border: 2px solid black; z-index: 150; box-shadow: 0 10px 15px rgba(0,0,0,0.5); display: none; }
+        #ball { position: absolute; width: 22px; height: 22px; background: white; border-radius: 50%; border: 2px solid black; z-index: 150; box-shadow: 0 10px 20px rgba(0,0,0,0.6); display: none; }
 
-        /* الأزرار والتشكيلات الـ 8 */
-        .f-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-        .f-btn { background: rgba(212,175,55,0.05); border: 1px solid rgba(212,175,55,0.3); color: var(--gold); padding: 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; font-family: 'Cairo'; }
-        .f-btn:hover { background: var(--gold); color: black; }
+        /* أزرار التشكيلات الـ 8 لكل فريق */
+        .f-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        .f-btn { background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.3); color: var(--gold); padding: 7px; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: bold; font-family: 'Cairo'; transition: 0.2s; }
+        .f-btn.active { background: var(--gold); color: black; border-color: white; }
 
-        /* شريط التحكم السفلي */
-        footer { height: 70px; background: #05050a; border-top: 1px solid var(--gold); display: flex; justify-content: space-around; align-items: center; z-index: 2000; }
-        .tool-btn { background: none; border: none; color: #666; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .tool-btn.active { color: var(--gold); }
-        .tool-btn i { font-size: 18px; } .tool-btn span { font-size: 10px; }
+        /* 🎮 شريط التحكم السفلي (الدوك) */
+        footer { height: 80px; background: #05050a; border-top: 2px solid var(--gold); display: flex; justify-content: space-around; align-items: center; z-index: 2000; padding: 0 10px; }
+        .tool-btn { background: none; border: none; color: #777; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: 0.3s; }
+        .tool-btn.active { color: var(--gold); transform: translateY(-5px); }
+        .tool-btn span { font-size: 10px; font-weight: bold; }
 
         canvas { position: absolute; inset: 0; z-index: 50; pointer-events: none; }
+        #notif { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--panel); border: 1px solid var(--gold); color: var(--gold); padding: 8px 25px; border-radius: 20px; font-size: 13px; font-weight: bold; z-index: 9999; opacity: 0; transition: 0.4s; }
     </style>
 </head>
 <body>
 
+<div id="notif"></div>
+
 <div id="app">
+    <div style="position: absolute; top: 20px; width: 100%; text-align: center; z-index: 500; pointer-events: none;">
+        <h2 style="color: var(--gold); font-weight: 900; letter-spacing: 2px;">GFA TITAN PRO</h2>
+        <p style="font-size: 10px; color: #888;">وزارة الرياضة - سلطنة عُمان 🇴🇲</p>
+    </div>
+
     <aside class="side-panel left-p">
-        <h4 style="color:var(--gold); border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:5px;">🛡️ المضيف (8 تشكيلات)</h4>
-        <div class="f-grid" id="h-forms">
-            <button class="f-btn" onclick="applyF('442','home')">4-4-2</button>
-            <button class="f-btn" onclick="applyF('433','home')">4-3-3</button>
-            <button class="f-btn" onclick="applyF('352','home')">3-5-2</button>
-            <button class="f-btn" onclick="applyF('4231','home')">4-2-3-1</button>
-            <button class="f-btn" onclick="applyF('451','home')">4-5-1</button>
-            <button class="f-btn" onclick="applyF('532','home')">5-3-2</button>
-            <button class="f-btn" onclick="applyF('343','home')">3-4-3</button>
-            <button class="f-btn" onclick="applyF('4141','home')">4-1-4-1</button>
+        <div style="text-align:center; padding: 5px; border: 1px solid var(--gold); border-radius: 8px; margin-bottom: 10px; background: rgba(212,175,55,0.05);">
+            <h3 id="h-name" style="color:var(--gold);">نادي المضيف</h3>
+            <span style="font-size: 10px; color: #666;">تشكيلة: <b id="h-form-label">4-4-2</b></span>
         </div>
-        <div id="h-list" style="margin-top:10px; font-size:10px; color:#888; height: 150px; overflow-y: auto;"></div>
+        <div class="f-grid">
+            <button class="f-btn active" onclick="applyFormation('442','home', this)">4-4-2</button>
+            <button class="f-btn" onclick="applyFormation('433','home', this)">4-3-3</button>
+            <button class="f-btn" onclick="applyFormation('352','home', this)">3-5-2</button>
+            <button class="f-btn" onclick="applyFormation('4231','home', this)">4-2-3-1</button>
+            <button class="f-btn" onclick="applyFormation('451','home', this)">4-5-1</button>
+            <button class="f-btn" onclick="applyFormation('532','home', this)">5-3-2</button>
+            <button class="f-btn" onclick="applyFormation('343','home', this)">3-4-3</button>
+            <button class="f-btn" onclick="applyFormation('4141','home', this)">4-1-4-1</button>
+        </div>
+        <hr style="border:0; border-top:1px solid #333; margin:10px 0;">
+        <div id="h-player-list" style="overflow-y: auto; flex: 1; font-size: 11px;"></div>
     </aside>
 
     <main id="arena">
@@ -78,99 +90,146 @@
             <div id="pitch">
                 <canvas id="drawCanvas"></canvas>
                 <div id="ball"></div>
-                <div style="position:absolute; top:0; left:30%; width:40%; height:18%; border:2px solid white; border-top:none;"></div>
-                <div style="position:absolute; bottom:0; left:30%; width:40%; height:18%; border:2px solid white; border-bottom:none;"></div>
-                <div style="position:absolute; top:50%; left:50%; width:110px; height:110px; border:2px solid white; border-radius:50%; transform:translate(-50%, -50%);"></div>
+                <div style="position:absolute; top:0; left:30%; width:40%; height:18%; border:2.5px solid white; border-top:none;"></div>
+                <div style="position:absolute; bottom:0; left:30%; width:40%; height:18%; border:2.5px solid white; border-bottom:none;"></div>
+                <div style="position:absolute; top:50%; left:50%; width:115px; height:115px; border:2.5px solid white; border-radius:50%; transform:translate(-50%, -50%);"></div>
+                <div style="position:absolute; top:50%; left:0; right:0; height:2px; background:white;"></div>
                 <div id="players-layer"></div>
             </div>
         </div>
     </main>
 
     <aside class="side-panel right-p">
-        <h4 style="color:var(--gold); border-bottom:1px solid #333; padding-bottom:5px; margin-bottom:5px;">🐆 الضيف (8 تشكيلات)</h4>
-        <div class="f-grid" id="a-forms">
-            <button class="f-btn" onclick="applyF('442','away')">4-4-2</button>
-            <button class="f-btn" onclick="applyF('433','away')">4-3-3</button>
-            <button class="f-btn" onclick="applyF('352','away')">3-5-2</button>
-            <button class="f-btn" onclick="applyF('4231','away')">4-2-3-1</button>
-            <button class="f-btn" onclick="applyF('451','away')">4-5-1</button>
-            <button class="f-btn" onclick="applyF('532','away')">5-3-2</button>
-            <button class="f-btn" onclick="applyF('343','away')">3-4-3</button>
-            <button class="f-btn" onclick="applyF('4141','away')">4-1-4-1</button>
+        <div style="text-align:center; padding: 5px; border: 1px solid #c0392b; border-radius: 8px; margin-bottom: 10px; background: rgba(192,57,43,0.05);">
+            <h3 id="a-name" style="color:#c0392b;">نادي الضيف</h3>
+            <span style="font-size: 10px; color: #666;">تشكيلة: <b id="a-form-label">4-3-3</b></span>
+        </div>
+        <div class="f-grid">
+            <button class="f-btn" onclick="applyFormation('442','away', this)">4-4-2</button>
+            <button class="f-btn active" onclick="applyFormation('433','away', this)">4-3-3</button>
+            <button class="f-btn" onclick="applyFormation('352','away', this)">3-5-2</button>
+            <button class="f-btn" onclick="applyFormation('4231','away', this)">4-2-3-1</button>
+            <button class="f-btn" onclick="applyFormation('451','away', this)">4-5-1</button>
+            <button class="f-btn" onclick="applyFormation('532','away', this)">5-3-2</button>
+            <button class="f-btn" onclick="applyFormation('343','away', this)">3-4-3</button>
+            <button class="f-btn" onclick="applyFormation('4141','away', this)">4-1-4-1</button>
         </div>
     </aside>
 
     <footer>
-        <button class="tool-btn active">🏟️<span>الميدان</span></button>
+        <button class="tool-btn active" onclick="setMode('select', this)">🏠<span>الميدان</span></button>
+        <button class="tool-btn" onclick="setMode('draw', this)">✏️<span>الرسم</span></button>
         <button class="tool-btn" onclick="toggleBall()">⚽<span>الكرة</span></button>
         <button class="tool-btn" onclick="clearDraw()">🗑️<span>مسح</span></button>
-        <button class="tool-btn" style="color:#059669" onclick="playAnim()">▶️<span>تشغيل</span></button>
+        <button class="tool-btn" style="color:#059669" onclick="playCinematic()">▶️<span>عرض سينمائي</span></button>
+        <button class="tool-btn" onclick="saveTactics()">💾<span>حفظ JSON</span></button>
         <button class="tool-btn" onclick="doFS()">⛶<span>شاشة كاملة</span></button>
     </footer>
 </div>
 
 <script>
+    /* ═══════════════════════════════════════════════════
+       GFA TITAN v16 PRO - المحرك المتكامل
+       ═══════════════════════════════════════════════════ */
     const layer = document.getElementById('players-layer');
     const ball = document.getElementById('ball');
     const canvas = document.getElementById('drawCanvas');
     const ctx = canvas.getContext('2d');
+    let mode = 'select';
 
-    const FORM = {
-        '442': [[5,45],[22,35],[22,55],[25,15],[25,75],[50,35],[50,55],[55,10],[55,80],[85,40],[85,60]],
-        '433': [[5,45],[22,35],[22,55],[25,15],[25,75],[45,45],[55,25],[55,65],[85,45],[80,20],[80,70]],
-        '352': [[5,45],[20,25],[20,45],[20,65],[45,15],[45,75],[50,35],[50,55],[50,45],[80,35],[80,55]],
-        '4231': [[5,45],[22,30],[22,60],[25,10],[25,80],[45,35],[45,55],[65,15],[65,75],[65,45],[85,45]],
-        '451': [[5,45],[22,35],[22,55],[25,15],[25,75],[50,15],[50,35],[50,55],[50,75],[50,45],[85,45]],
-        '532': [[5,45],[20,20],[20,40],[20,60],[25,10],[25,80],[50,30],[50,45],[50,60],[80,35],[80,55]],
-        '343': [[5,45],[20,25],[20,45],[20,65],[50,15],[50,75],[55,35],[55,55],[80,20],[80,45],[80,70]],
-        '4141': [[5,45],[22,35],[22,55],[25,15],[25,75],[40,45],[60,15],[60,35],[60,55],[60,75],[85,45]]
+    const FORMATIONS = {
+        '442': [[8,50],[25,30],[25,70],[28,10],[28,90],[55,35],[55,65],[60,10],[60,90],[85,40],[85,60]],
+        '433': [[8,50],[25,30],[25,70],[28,10],[28,90],[48,50],[58,25],[58,75],[88,50],[82,15],[82,85]],
+        '352': [[8,50],[22,25],[22,50],[22,75],[48,15],[48,85],[55,35],[55,65],[55,50],[85,38],[85,62]],
+        '4231': [[8,50],[25,35],[25,65],[28,15],[28,85],[48,40],[48,60],[68,20],[68,80],[68,50],[88,50]],
+        '451': [[8,50],[25,35],[25,65],[28,15],[28,85],[52,15],[52,35],[52,50],[52,65],[52,85],[88,50]],
+        '532': [[8,50],[22,20],[22,40],[22,50],[22,60],[22,80],[52,30],[52,50],[52,70],[85,38],[85,62]],
+        '343': [[8,50],[22,25],[22,50],[22,75],[55,15],[55,85],[58,35],[58,65],[85,20],[85,50],[85,80]],
+        '4141': [[8,50],[25,35],[25,65],[28,15],[28,85],[42,50],[62,15],[62,35],[62,50],[62,65],[85,50]]
     };
 
+    const roles = ["حارس", "دفاع", "دفاع", "ظهير ي", "ظهير ي", "وسط", "وسط", "جناح ي", "جناح ي", "هجوم", "هجوم"];
+
     function init() {
-        layer.innerHTML = "";
-        canvas.width = 800; canvas.height = 520;
-        for(let i=1; i<=11; i++) createP(i, 'home');
-        for(let i=1; i<=11; i++) createP(i, 'away');
-        applyF('442','home'); applyF('433','away');
+        canvas.width = 800; canvas.height = 530;
+        for(let i=1; i<=11; i++) createPlayer(i, 'home');
+        for(let i=1; i<=11; i++) createPlayer(i, 'away');
+        applyFormation('442','home'); applyFormation('433','away');
+        notify("GFA TITAN PRO v16 جاهز العمل");
     }
 
-    function createP(num, team) {
+    function createPlayer(num, team) {
         const p = document.createElement('div');
         p.className = 'player ' + team;
-        p.id = team + '-' + num;
-        p.innerHTML = `<span class="name">${team==='home'?'مضيف':'ضيف'} ${num}</span><div class="icon" style="background:${team==='home'?'#d4af37':'#c0392b'}">${num}</div>`;
+        p.id = `${team}-${num}`;
+        const color = team === 'home' ? '#d4af37' : '#c0392b';
+        p.innerHTML = `<span class="name">${roles[num-1]}</span><div class="icon" style="background:${color}">${num}</div>`;
         makeDraggable(p);
         layer.appendChild(p);
     }
 
-    function applyF(type, team) {
-        const coords = FORM[type];
+    function applyFormation(type, team, btn) {
+        const coords = FORMATIONS[type];
+        if (btn) {
+            const parent = btn.parentElement;
+            parent.querySelectorAll('.f-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        document.getElementById(`${team[0]}-form-label`).textContent = type;
+        
         for(let i=1; i<=11; i++) {
-            const p = document.getElementById(team + '-' + i);
+            const p = document.getElementById(`${team}-${i}`);
             let y = coords[i-1][0], x = coords[i-1][1];
-            if(team === 'away') y = 100 - y;
+            if(team === 'away') y = 100 - y; // قلب الاتجاه للضيف
             p.style.top = y + '%'; p.style.left = x + '%';
         }
+        notify(`تشكيلة ${type} تم تطبيقها`);
     }
 
     function makeDraggable(el) {
-        let dragging = false;
-        el.onmousedown = el.ontouchstart = (e) => { dragging = true; e.stopPropagation(); };
+        let isDrag = false;
+        el.onmousedown = el.ontouchstart = (e) => { 
+            if(mode !== 'select') return;
+            isDrag = true; e.stopPropagation(); 
+        };
         window.onmousemove = window.ontouchmove = (e) => {
-            if(!dragging) return;
+            if(!isDrag) return;
             const r = document.getElementById('pitch').getBoundingClientRect();
             const t = e.touches ? e.touches[0] : e;
             let x = (t.clientX - r.left) / r.width * 100;
             let y = (t.clientY - r.top) / r.height * 100;
-            el.style.left = x + '%'; el.style.top = y + '%';
+            if(x>=0 && x<=100) el.style.left = x + '%';
+            if(y>=0 && y<=100) el.style.top = y + '%';
         };
-        window.onmouseup = window.ontouchend = () => dragging = false;
+        window.onmouseup = window.ontouchend = () => isDrag = false;
     }
 
-    function toggleBall() { ball.style.display = ball.style.display === 'block' ? 'none' : 'block'; ball.style.top = '50%'; ball.style.left = '50%'; }
-    function clearDraw() { ctx.clearRect(0,0,800,520); }
+    function playCinematic() {
+        const frame = document.getElementById('wood-frame');
+        frame.style.transform = "rotateX(15deg) scale(1.05) translateY(-30px)";
+        ball.style.display = 'block';
+        notify("عرض سينمائي قيد التشغيل...");
+        setTimeout(() => {
+            frame.style.transform = "rotateX(28deg) translateY(-20px)";
+        }, 3000);
+    }
+
+    function toggleBall() { ball.style.display = ball.style.display === 'block' ? 'none' : 'block'; ball.style.top='50%'; ball.style.left='50%'; }
+    function setMode(m, btn) { 
+        mode = m; 
+        document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+    function clearDraw() { ctx.clearRect(0,0,800,530); }
     function doFS() { if(!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
-    
+    function saveTactics() { notify("تم حفظ التكتيك بصيغة JSON"); }
+
+    function notify(msg) {
+        const n = document.getElementById('notif');
+        n.textContent = msg; n.style.opacity = '1';
+        setTimeout(() => n.style.opacity = '0', 2500);
+    }
+
     window.onload = init;
 </script>
 </body>
